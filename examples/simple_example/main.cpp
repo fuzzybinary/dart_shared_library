@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-int main() {
-    
-    printf("Hello world");
-    
-    return 0;
+#include "src/dart_dll.h"
+
+void main() {
+  DartDll_Initialize();
+  printf("Hello World!");
 }

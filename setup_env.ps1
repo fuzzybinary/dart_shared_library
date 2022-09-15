@@ -1,0 +1,3 @@
+$Env:GYP_MSVS_OVERRIDE_PATH="C:\Program Files\Microsoft Visual Studio\2022\Community\"
+$Env:GYP_MSVS_VERSION=2019
+$Env:DEPOT_TOOLS_WIN_TOOLCHAIN=0
