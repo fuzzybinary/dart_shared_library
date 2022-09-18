@@ -1,2 +1,2 @@
 dart-sdk/*
-bazel-*/
+.build/*

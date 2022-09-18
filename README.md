@@ -18,7 +18,7 @@ I also hope to support all platforms that Dart currently supports, plus a few ex
 
 ## Current Progress
 
-None. I literally just started.
+A very, very simple Dart script works.
 
 ## Using
 
@@ -26,12 +26,11 @@ None. I literally just started.
 
 ## Building
 
-* Fetch the Dart SDK into this directory. Follow the instructions from [the dart repo](https://github.com/dart-lang/sdk/wiki/Building#source). Put it in `dart-sdk`. The code and scripts assume that this is where the dart-sdk lives.
-* Build the Dart libraries
-  * There is a Dart script for doing this that will do some checks for you as well:
-  ```
-  dart tools/build/build.dart
-  ```
+### Prerequisets
+You need
+* git
+* All the things to get Dart source - https://github.com/dart-lang/sdk/wiki/Building#source
+* C++ build tools for your platform (Visual Studio, XCode, gcc, etc)
 
 ## Contributing
 
@@ -39,7 +38,7 @@ None. I literally just started.
 
 # What I Did
 
-This section is as much for my benefit as for yours.
+This section is as much for my benefit as for yours. Eventually, I hope to make a script that will do most of this.
 
 * Modify the BUILD.gn files to add a `libdart` target. This is done by applying the patch in `./dart_sdk.patch`
 * Make sure all correct environment variables are set
@@ -49,5 +48,11 @@ This section is as much for my benefit as for yours.
   python ./tools/build.py --no-goma -m release libdart
   ```
 * Revert the changes made to build files to leave a clean copy of the dart-sdk (this makes updating easier)
-* Build the dynamic library using the Bazel script
-  * This puts the output in `out/lib/platform` and `out/include`. The various examples look for these directories, and these can be copied for use in other projects.
+* Generate build scripts with genie (located in tools/[platform]) e.g.
+  ```bash
+  tools/win/genie.exe vs2022
+  ```
+* Note only the Visual Studio target will work right now, as it's the only one I've tested.
+* Open the generated build files (in ./.build/projects/[arch_platform]) and build the project.
+* Build.
+* Run one of the examples!
