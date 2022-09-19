@@ -104,6 +104,8 @@ solution "dart_dll"
     project ("simple_example")
         uuid (os.uuid("simple_example"))
         kind "ConsoleApp"
+
+        debugdir (path.join(PROJECT_DIR, "examples", "simple_example"))
     
         files {
             path.join(PROJECT_DIR, "examples", "simple_example", "**.cpp"),

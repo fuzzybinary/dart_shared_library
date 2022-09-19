@@ -49,8 +49,7 @@ int main() {
 
   // Load your main isolate file, also providing the path to a package config if one exists.
   // The build makes sure these are coppied to the output directory for running the example
-  Dart_Isolate isolate =
-      DartDll_LoadScript("C:\\dart_dll\\.build\\win64_vs2022\\bin\\hello_world.dart", nullptr);
+  Dart_Isolate isolate = DartDll_LoadScript("hello_world.dart", nullptr);
   if (isolate == nullptr) {
     return -1;
   }

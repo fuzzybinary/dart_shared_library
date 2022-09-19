@@ -5,8 +5,10 @@
 #include <include/dart_api.h>
 #include <include/dart_embedder_api.h>
 
+#include <bin/dartutils.h>
 #include <bin/dfe.h>
 #include <bin/isolate_data.h>
+#include <bin/loader.h>
 
 using namespace dart::bin;
 
@@ -93,6 +95,35 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
   return isolate;
 }
 
+Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
+                               IsolateData* isolate_data,
+                               bool is_isolate_group_start,
+                               const char** resolved_packages_config) {
+  Dart_Handle result;
+
+  // Prepare builtin and other core libraries for use to resolve URIs.
+  // Set up various closures, e.g: printing, timers etc.
+  // Set up package configuration for URI resolution.
+  result = DartUtils::PrepareForScriptLoading(false, true);
+  if (Dart_IsError(result)) return result;
+
+  // Setup packages config if specified.
+  const char* packages_file = isolate_data->packages_file();
+  result = DartUtils::SetupPackageConfig(packages_file);
+  if (Dart_IsError(result)) return result;
+
+  if (!Dart_IsNull(result) && resolved_packages_config != nullptr) {
+    result = Dart_StringToCString(result, resolved_packages_config);
+    if (Dart_IsError(result)) return result;
+
+    if (is_isolate_group_start) {
+      IsolateGroupData* isolate_group_data = isolate_data->isolate_group_data();
+      isolate_group_data->set_resolved_packages_config(
+          *resolved_packages_config);
+    }
+  }
+}
+
 Dart_Isolate CreateIsolate(bool is_main_isolate,
                            const char* script_uri,
                            const char* name,
@@ -100,11 +131,10 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
                            Dart_IsolateFlags* flags,
                            void* callback_data,
                            char** error) {
+  Dart_Handle result;
+
   uint8_t* kernel_buffer = nullptr;
   intptr_t kernel_buffer_size;
-
-  PathSanitizer script_uri_sanitizer(script_uri);
-  PathSanitizer packages_config_sanitiser(packages_config);
 
   dfe.ReadScript(script_uri, &kernel_buffer, &kernel_buffer_size);
   flags->null_safety = true;
@@ -140,8 +170,24 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
   Dart_EnterScope();
 
   // TODO - Set Library Tag Handler, SetupCoreLibraries
+  result = Dart_SetLibraryTagHandler(Loader::LibraryTagHandler);
+  if (Dart_IsError(result)) {
+    std::cerr << "Error setting LibraryTag Handler: " << *error << std::endl;
+    Dart_ExitScope();
+    Dart_ShutdownIsolate();
+    return nullptr;
+  }
+
   const char* resolved_packages_config = nullptr;
-  //SetupCoreLibraries(isolate, isolate_data, true, &resolvedPackagesConfig);
+  result = SetupCoreLibraries(isolate, isolate_data, true,
+                              &resolved_packages_config);
+  if (Dart_IsError(result)) {
+    std::cerr << "Error setting up core libraries for isolate: " << *error
+              << std::endl;
+    Dart_ExitScope();
+    Dart_ShutdownIsolate();
+    return nullptr;
+  }
 
   if (kernel_buffer == nullptr && !Dart_IsKernelIsolate(isolate)) {
     uint8_t* application_kernel_buffer = nullptr;
