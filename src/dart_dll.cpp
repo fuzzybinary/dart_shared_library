@@ -76,7 +76,7 @@ bool OnIsolateInitialize(void** child_callback_data, char** error) {
   //                                        /*group_start=*/false,
   //                                        /*resolved_packages_config=*/nullptr);
   if (Dart_IsError(result)) {
-    *error = _strdup(Dart_GetError(result));
+    *error = strdup(Dart_GetError(result));
     Dart_ExitScope();
     return false;
   }
@@ -151,10 +151,7 @@ Dart_Isolate DartDll_LoadScript(const char* script_uri, const char* package_conf
   char* error = nullptr;
   Dart_Isolate isolate = CreateIsolate(true, script_uri, "main", package_config,
                                        &isolate_flags, nullptr, &error);
-  if (isolate == nullptr) {
-    return false;
-  }
-
+  
   return isolate;
 }
 

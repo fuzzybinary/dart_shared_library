@@ -2,10 +2,14 @@
 
 typedef struct _Dart_Isolate* Dart_Isolate;
 
-#ifdef DART_DLL_EXPORTING
+#ifdef _WIN
+  #ifdef DART_DLL_EXPORTING
     #define DART_DLL_EXPORT __declspec(dllexport)
-#else
+  #else
     #define DART_DLL_EXPORT __declspec(dllimport)
+  #endif
+#else
+  #define DART_DLL_EXPORT
 #endif
 
 DART_DLL_EXPORT bool DartDll_Initialize();

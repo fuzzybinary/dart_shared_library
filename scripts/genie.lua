@@ -23,6 +23,8 @@ solution "dart_dll"
 		defines {
 			"NDEBUG",
 		}
+    
+    configuration {}
 
     language "C++"
 
@@ -58,6 +60,10 @@ solution "dart_dll"
         targetdir (path.join(BUILD_DIR, "win64_" .. _ACTION, "bin"))
         objdir (path.join(BUILD_DIR, "win64_" .. _ACTION, "obj"))
 
+    configuration { "macosx" }
+        targetdir (path.join(BUILD_DIR, "mac_" .. _ACTION, "bin"))
+        objdir (path.join(BUILD_DIR, "mac_" .. _ACTION, "obj"))
+        
     configuration {}
 
     project ("dart_dll")
@@ -74,6 +80,43 @@ solution "dart_dll"
                 "StaticRuntime",
                 "OptimizeSpeed"
             }
+
+            links {
+                "libdart",
+                "dbghelp",
+                "bcrypt",
+                "rpcrt4",
+                "ws2_32",
+                "Iphlpapi",
+                "Psapi",
+                "shlwapi"
+            }
+            libdirs {
+                path.join(DART_DIR, "out", "ReleaseX64", "obj", "runtime", "bin")
+            }
+
+        configuration { "macosx" }
+            links {
+                "dart"
+            }
+            libdirs {
+                path.join(DART_DIR, "xcodebuild", "ReleaseX64", "obj", "runtime", "bin")
+            }
+            linkoptions {
+                "-framework Cocoa",
+                "-framework QuartzCore",
+                "-framework Security",
+                "-nostdlib++ " .. path.getabsolute(path.join(DART_DIR, "buildtools", "mac-x64", "clang", "lib", "libc++.a"))
+            }
+            xcodeprojectopts {
+                COMPILER_INDEX_STORE_ENABLE = "NO",
+                CC = path.getabsolute(path.join(DART_DIR, "buildtools", "mac-x64", "clang", "bin", "clang")),
+                CXX = path.getabsolute(path.join(DART_DIR, "buildtools", "mac-x64", "clang", "bin", "clang++"))
+            }
+
+            buildoptions {
+                "-Wno-unknown-pragmas"
+            }
         
         configuration {}
         
@@ -86,21 +129,6 @@ solution "dart_dll"
             path.join(DART_DIR, "runtime")
         }
 
-        links {
-            "libdart",
-            "dbghelp",
-            "bcrypt",
-            "rpcrt4",
-            "ws2_32",
-            "Iphlpapi",
-            "Psapi",
-            "shlwapi"
-        }
-
-        libdirs {
-            path.join(DART_DIR, "out", "ReleaseX64", "obj", "runtime", "bin")
-        }
-        
     project ("simple_example")
         uuid (os.uuid("simple_example"))
         kind "ConsoleApp"

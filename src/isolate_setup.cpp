@@ -44,6 +44,8 @@ Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
           *resolved_packages_config);
     }
   }
+
+  return result;
 }
 
 Dart_Isolate CreateKernelIsolate(const char* script_uri,
