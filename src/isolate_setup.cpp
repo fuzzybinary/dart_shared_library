@@ -17,6 +17,35 @@ extern const uint8_t kDartCoreIsolateSnapshotData[];
 extern const uint8_t kDartCoreIsolateSnapshotInstructions[];
 }
 
+Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
+                               IsolateData* isolate_data,
+                               bool is_isolate_group_start,
+                               const char** resolved_packages_config) {
+  Dart_Handle result;
+
+  // Prepare builtin and other core libraries for use to resolve URIs.
+  // Set up various closures, e.g: printing, timers etc.
+  // Set up package configuration for URI resolution.
+  result = DartUtils::PrepareForScriptLoading(false, true);
+  if (Dart_IsError(result)) return result;
+
+  // Setup packages config if specified.
+  const char* packages_file = isolate_data->packages_file();
+  result = DartUtils::SetupPackageConfig(packages_file);
+  if (Dart_IsError(result)) return result;
+
+  if (!Dart_IsNull(result) && resolved_packages_config != nullptr) {
+    result = Dart_StringToCString(result, resolved_packages_config);
+    if (Dart_IsError(result)) return result;
+
+    if (is_isolate_group_start) {
+      IsolateGroupData* isolate_group_data = isolate_data->isolate_group_data();
+      isolate_group_data->set_resolved_packages_config(
+          *resolved_packages_config);
+    }
+  }
+}
+
 Dart_Isolate CreateKernelIsolate(const char* script_uri,
                                  const char* main,
                                  const char* package_root,
@@ -51,9 +80,14 @@ Dart_Isolate CreateKernelIsolate(const char* script_uri,
   }
 
   // Needed?
-  // Dart_EnterIsolate(isolate);
-  // Dart_SetLibraryTagHandeler(LibraryTagHandler);
-  // SetupCoreLibraries(isolate, isolate_data, false, nullptr);
+  Dart_EnterIsolate(isolate);
+  Dart_EnterScope();
+
+  Dart_SetLibraryTagHandler(Loader::LibraryTagHandler);
+  SetupCoreLibraries(isolate, isolate_data, false, nullptr);
+
+  Dart_ExitScope();
+  Dart_ExitIsolate();
 
   return isolate;
 }
@@ -78,7 +112,7 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
                                               isolate_group_data, isolate_data};
 
   dart::embedder::VmServiceConfiguration vm_config = {
-      "127.0.0.1", 5858, nullptr, false, true, false};
+      "127.0.0.1", 5858, nullptr, true, true, true};
 
   Dart_Isolate isolate = dart::embedder::CreateVmServiceIsolate(
       data, vm_config, isolate_snapshot_data, isolate_snapshot_instructions,
@@ -93,35 +127,6 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
   // TODO -- Dart_SetEnvironmentCallback(DartUtils::EnvironmentCallback)
 
   return isolate;
-}
-
-Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
-                               IsolateData* isolate_data,
-                               bool is_isolate_group_start,
-                               const char** resolved_packages_config) {
-  Dart_Handle result;
-
-  // Prepare builtin and other core libraries for use to resolve URIs.
-  // Set up various closures, e.g: printing, timers etc.
-  // Set up package configuration for URI resolution.
-  result = DartUtils::PrepareForScriptLoading(false, true);
-  if (Dart_IsError(result)) return result;
-
-  // Setup packages config if specified.
-  const char* packages_file = isolate_data->packages_file();
-  result = DartUtils::SetupPackageConfig(packages_file);
-  if (Dart_IsError(result)) return result;
-
-  if (!Dart_IsNull(result) && resolved_packages_config != nullptr) {
-    result = Dart_StringToCString(result, resolved_packages_config);
-    if (Dart_IsError(result)) return result;
-
-    if (is_isolate_group_start) {
-      IsolateGroupData* isolate_group_data = isolate_data->isolate_group_data();
-      isolate_group_data->set_resolved_packages_config(
-          *resolved_packages_config);
-    }
-  }
 }
 
 Dart_Isolate CreateIsolate(bool is_main_isolate,

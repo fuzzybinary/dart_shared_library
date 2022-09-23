@@ -56,3 +56,11 @@ This section is as much for my benefit as for yours. Eventually, I hope to make 
 * Open the generated build files (in ./.build/projects/[arch_platform]) and build the project.
 * Build.
 * Run one of the examples!
+
+Updating the dart-sdk
+* Make sure environment variables are set (`setup_env.ps1`)
+* From `dart-sdk/sdk`:
+  * `git checkout tags/[version]`
+  * `gclient sync --no-goma`
+  * reapply dart_sdk.patch (`git apply ../../dart_sdk.patch`)
+  * `python ./tools/build.py --no-goma -m release libdart`
