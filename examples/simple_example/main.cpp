@@ -63,28 +63,7 @@ int main() {
   Dart_SetNativeResolver(library, ResolveNativeFunction, nullptr);
 
   // And run "main"
-  Dart_Handle mainClosure =
-      Dart_GetField(library, Dart_NewStringFromCString("main"));
-  if (!Dart_IsClosure(mainClosure)) {
-    std::cerr << "Unable to find 'main' in root library hello_world.dart";
-    Dart_ExitScope();
-    DartDll_Shutdown();
-    return -1;
-  }
-
-  // Call _startIsolate in the isolate library to enable dispatching the
-  // initial startup message.
-  const intptr_t kNumIsolateArgs = 2;
-  Dart_Handle isolateArgs[2] = {mainClosure, Dart_Null()};
-  Dart_Handle isolateLib =
-      Dart_LookupLibrary(Dart_NewStringFromCString("dart:isolate"));
-  Dart_Handle result =
-      Dart_Invoke(isolateLib, Dart_NewStringFromCString("_startMainIsolate"),
-                  kNumIsolateArgs, isolateArgs);
-
-  // Keep handling messages until the last active receive port is closed.
-  result = Dart_RunLoop();
-
+  Dart_Handle result = DartDll_RunMain(library);
   if (Dart_IsError(result)) {
     std::cerr << "Failed to invoke main: " << Dart_GetError(result);
   }

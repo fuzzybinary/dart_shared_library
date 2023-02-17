@@ -71,16 +71,7 @@ bool OnIsolateInitialize(void** child_callback_data, char** error) {
   *child_callback_data = isolate_data;
 
   Dart_EnterScope();
-  Dart_Handle result;
-  //Dart_Handle result = SetupCoreLibraries(isolate, isolate_data,
-  //                                        /*group_start=*/false,
-  //                                        /*resolved_packages_config=*/nullptr);
-  if (Dart_IsError(result)) {
-    *error = strdup(Dart_GetError(result));
-    Dart_ExitScope();
-    return false;
-  }
-
+  
   // Make the isolate runnable so that it is ready to handle messages.
   Dart_ExitScope();
   Dart_ExitIsolate();
@@ -89,7 +80,7 @@ bool OnIsolateInitialize(void** child_callback_data, char** error) {
   return *error == nullptr;
 }
 
-static void OnIsolateShutdown(void* isolate_group_data, void* isolate_data) {
+static void OnIsolateShutdown(void*, void*) {
   Dart_EnterScope();
   Dart_Handle sticky_error = Dart_GetStickyError();
   if (!Dart_IsNull(sticky_error) && !Dart_IsFatalError(sticky_error)) {
@@ -98,7 +89,7 @@ static void OnIsolateShutdown(void* isolate_group_data, void* isolate_data) {
   Dart_ExitScope();
 }
 
-static void DeleteIsolateData(void* isolate_group_data, void* callback_data) {
+static void DeleteIsolateData(void*, void* callback_data) {
   auto isolate_data = reinterpret_cast<IsolateData*>(callback_data);
   delete isolate_data;
 }
@@ -153,6 +144,67 @@ Dart_Isolate DartDll_LoadScript(const char* script_uri, const char* package_conf
                                        &isolate_flags, nullptr, &error);
   
   return isolate;
+}
+
+Dart_Handle DartDll_RunMain(Dart_Handle library) {
+  Dart_Handle mainClosure =
+      Dart_GetField(library, Dart_NewStringFromCString("main"));
+  if (!Dart_IsClosure(mainClosure)) {
+    std::cerr << "Unable to find 'main' in root library hello_world.dart";
+    return mainClosure;
+  }
+
+  // Call _startIsolate in the isolate library to enable dispatching the
+  // initial startup message.
+  const intptr_t kNumIsolateArgs = 2;
+  Dart_Handle isolateArgs[2] = {mainClosure, Dart_Null()};
+  Dart_Handle isolateLib =
+      Dart_LookupLibrary(Dart_NewStringFromCString("dart:isolate"));
+  Dart_Handle result =
+      Dart_Invoke(isolateLib, Dart_NewStringFromCString("_startMainIsolate"),
+                  kNumIsolateArgs, isolateArgs);
+  if (Dart_IsError(result)) {
+    std::cout << "Dart initialized, error was: "
+              << Dart_GetError(result) << std::endl;
+    return result;
+  }
+
+  // Keep handling messages until the last active receive port is closed.
+  result = Dart_RunLoop();
+
+  return result;
+}
+
+Dart_Handle DartDll_DrainMicrotaskQueue() {
+  Dart_EnterScope();
+
+  // TODO: Cache looking up the dart:isolate library
+  Dart_Handle libraryName = Dart_NewStringFromCString("dart:isolate");
+  Dart_Handle isolateLib = Dart_LookupLibrary(libraryName);
+  if (Dart_IsError(isolateLib)) {
+    std::cerr << "Error looking up 'dart:isolate' library: "
+              << Dart_GetError(isolateLib);
+    Dart_ExitScope();
+    return isolateLib;
+  }
+
+  Dart_Handle invokeName =
+      Dart_NewStringFromCString("_runPendingImmediateCallback");
+  Dart_Handle result = Dart_Invoke(isolateLib, invokeName, 0, nullptr);
+  if (Dart_IsError(result)) {
+    std::cerr << "Error draining microtask queue: " << Dart_GetError(result);
+    return result;
+  }
+  result = Dart_HandleMessage();
+  if (Dart_IsError(result)) {
+    std::cerr << "Error draining microtask queue: %s",
+                  Dart_GetError(result);
+    return result;
+  } 
+
+  Dart_ExitScope();
+
+  return result;
 }
 
 bool DartDll_Shutdown() {

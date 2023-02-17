@@ -10,11 +10,6 @@ solution "dart_dll"
     }
     platforms { "x64" }
 
-    configuration { "Debug" }
-		defines {
-			"_DEBUG",
-		}
-
 	configuration { "Release" }
 		flags {
 			"NoBufferSecurityCheck",
@@ -48,6 +43,11 @@ solution "dart_dll"
 
     location (path.join(BUILD_DIR, "projects", _ACTION))
 
+    configuration { "windows" }
+        defines {
+            "_WIN"
+        }
+
     configuration { "vs*" }
         defines { 
             "_HAS_EXCEPTIONS=0",
@@ -72,7 +72,8 @@ solution "dart_dll"
 
         configuration { "windows" }
             defines {
-                "DART_DLL_EXPORTING"
+                "DART_DLL_EXPORTING",
+                "_ITERATOR_DEBUG_LEVEL=0"
             }
 
             -- Both Debug and Release need to use the Release Static CRT
