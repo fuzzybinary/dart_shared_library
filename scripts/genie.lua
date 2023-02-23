@@ -3,6 +3,38 @@ PROJECT_DIR = path.getabsolute("..")
 local BUILD_DIR = path.join(PROJECT_DIR, ".build")
 local DART_DIR = path.join(PROJECT_DIR, "dart-sdk", "sdk")
 
+function dartDllExample(_name)
+    project (_name)
+        uuid (os.uuid(_name))
+        kind "ConsoleApp"
+
+        targetdir (path.join(BUILD_DIR, "win64_" .. _ACTION, "bin", _name))
+        debugdir (path.join(PROJECT_DIR, "examples", _name))
+    
+        files {
+            path.join(PROJECT_DIR, "examples", _name, "**.cpp"),
+            path.join(PROJECT_DIR, "examples", _name, "**.h")
+        }
+
+        links {
+            "dart_dll"
+        }
+
+        includedirs {
+            path.join(PROJECT_DIR, "src"),
+            path.join(DART_DIR, "runtime", "include")
+        }
+
+        configuration "windows"
+            postbuildcommands {  
+                "xcopy /Y \"" .. (path.translate(path.join(PROJECT_DIR, "examples", _name, "*.dart"))) .. "\" \"$(TARGETDIR)\"",
+                "xcopy /Y \"" .. (path.translate(path.join("$(TARGETDIR)", "..", "*.dll"))) .. "\" \"$(TARGETDIR)\"",
+                "xcopy /Y \"" .. (path.translate(path.join("$(TARGETDIR)", "..", "*.dll"))) .. "\" \"$(TARGETDIR)\""
+            }
+
+        configuration {}
+end
+
 solution "dart_dll"
     configurations {
         "Debug",
@@ -130,25 +162,6 @@ solution "dart_dll"
             path.join(DART_DIR, "runtime")
         }
 
-    project ("simple_example")
-        uuid (os.uuid("simple_example"))
-        kind "ConsoleApp"
-
-        debugdir (path.join(PROJECT_DIR, "examples", "simple_example"))
-    
-        files {
-            path.join(PROJECT_DIR, "examples", "simple_example", "**.cpp"),
-            path.join(PROJECT_DIR, "examples", "simple_example", "**.h")
-        }
-
-        links {
-            "dart_dll"
-        }
-
-        includedirs {
-            path.join(PROJECT_DIR, "src"),
-            path.join(DART_DIR, "runtime", "include")
-        }
-
-        configuration "windows"
-            postbuildcommands {  "xcopy /Y \"" .. (path.translate(path.join(PROJECT_DIR, "examples", "simple_example", "*.dart"))) .. "\" \"$(TARGETDIR)\"" }
+        group("examples")
+            dartDllExample("simple_example")
+            dartDllExample("simple_example_ffi")
