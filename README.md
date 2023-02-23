@@ -61,6 +61,6 @@ Updating the dart-sdk
 * Make sure environment variables are set (`setup_env.ps1`)
 * From `dart-sdk/sdk`:
   * `git checkout tags/[version]`
-  * `gclient sync --no-goma`
+  * `gclient sync -D`
   * reapply dart_sdk.patch (`git apply ../../dart_sdk.patch`)
   * `python ./tools/build.py --no-goma -m release libdart`
