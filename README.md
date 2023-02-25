@@ -48,11 +48,13 @@ This section is as much for my benefit as for yours. Eventually, I hope to make 
   python ./tools/build.py --no-goma -m release libdart
   ```
 * Revert the changes made to build files to leave a clean copy of the dart-sdk (this makes updating easier)
-* Generate build scripts with genie (located in tools/[platform]) e.g.
+* Generate build scripts with genie:
   ```bash
+  // Windows
   tools/win/genie.exe vs2022
+  // MacOS
+  ./tools/mac/genie xcode11
   ```
-* Note only the Visual Studio target will work right now, as it's the only one I've tested.
 * Open the generated build files (in ./.build/projects/[arch_platform]) and build the project.
 * Build.
 * Run one of the examples!
