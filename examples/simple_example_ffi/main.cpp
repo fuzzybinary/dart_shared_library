@@ -20,7 +20,7 @@ void SimplePrint(const char* string) {
 void* ResolveNativeFunction(const char* name, uintptr_t args_n) {
   void* native_function = nullptr;
   if (strcmp("SimplePrint", name) == 0) {
-    native_function = SimplePrint;
+    native_function = reinterpret_cast<void *>(SimplePrint);
   }
 
   return native_function;

@@ -2,6 +2,7 @@
 PROJECT_DIR = path.getabsolute("..")
 local BUILD_DIR = path.join(PROJECT_DIR, ".build")
 local DART_DIR = path.join(PROJECT_DIR, "dart-sdk", "sdk")
+local ARCH = "x64"
 
 function dartDllExample(_name)
     project (_name)
@@ -40,7 +41,7 @@ solution "dart_dll"
         "Debug",
         "Release",
     }
-    platforms { "x64" }
+    platforms { "x64", "arm64" }
 
 	configuration { "Release" }
 		flags {
@@ -75,7 +76,7 @@ solution "dart_dll"
 
     location (path.join(BUILD_DIR, "projects", _ACTION))
 
-    configuration { "windows" }
+    configuration { "windows", "x64" }
         defines {
             "_WIN"
         }
@@ -127,24 +128,27 @@ solution "dart_dll"
             libdirs {
                 path.join(DART_DIR, "out", "ReleaseX64", "obj", "runtime", "bin")
             }
+        
+        configuration { "arm64" }
+            ARCH = "arm64"
 
         configuration { "macosx" }
             links {
                 "dart"
             }
             libdirs {
-                path.join(DART_DIR, "xcodebuild", "ReleaseX64", "obj", "runtime", "bin")
+                path.join(DART_DIR, "xcodebuild", "Release" .. string.upper(ARCH) , "obj", "runtime", "bin")
             }
             linkoptions {
                 "-framework Cocoa",
                 "-framework QuartzCore",
                 "-framework Security",
-                "-nostdlib++ " .. path.getabsolute(path.join(DART_DIR, "buildtools", "mac-x64", "clang", "lib", "libc++.a"))
+                "-nostdlib++ " .. path.getabsolute(path.join(DART_DIR, "buildtools", "mac-" .. ARCH, "clang", "lib", "libc++.a"))
             }
             xcodeprojectopts {
                 COMPILER_INDEX_STORE_ENABLE = "NO",
-                CC = path.getabsolute(path.join(DART_DIR, "buildtools", "mac-x64", "clang", "bin", "clang")),
-                CXX = path.getabsolute(path.join(DART_DIR, "buildtools", "mac-x64", "clang", "bin", "clang++"))
+                CC = path.getabsolute(path.join(DART_DIR, "buildtools", "mac-" .. ARCH, "clang", "bin", "clang")),
+                CXX = path.getabsolute(path.join(DART_DIR, "buildtools", "mac-" .. ARCH, "clang", "bin", "clang++"))
             }
 
             buildoptions {
