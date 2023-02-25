@@ -9,7 +9,13 @@ function dartDllExample(_name)
         uuid (os.uuid(_name))
         kind "ConsoleApp"
 
-        targetdir (path.join(BUILD_DIR, "win64_" .. _ACTION, "bin", _name))
+        local PLATFORM = "win64"
+        configuration { "macosx" }
+            PLATFORM = "mac"
+        
+        configuration {}
+
+        targetdir (path.join(BUILD_DIR, PLATFORM .. "_" .. _ACTION, "bin", _name))
         debugdir (path.join(PROJECT_DIR, "examples", _name))
     
         files {

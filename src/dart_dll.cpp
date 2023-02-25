@@ -6,10 +6,10 @@
 #include <include/dart_api.h>
 #include <include/dart_embedder_api.h>
 
-#include <bin/dfe.h>
-#include <bin/isolate_data.h>
-#include <bin/gzip.h>
 #include <bin/dartutils.h>
+#include <bin/dfe.h>
+#include <bin/gzip.h>
+#include <bin/isolate_data.h>
 
 using namespace dart::bin;
 
@@ -71,7 +71,7 @@ bool OnIsolateInitialize(void** child_callback_data, char** error) {
   *child_callback_data = isolate_data;
 
   Dart_EnterScope();
-  
+
   // Make the isolate runnable so that it is ready to handle messages.
   Dart_ExitScope();
   Dart_ExitIsolate();
@@ -84,7 +84,8 @@ static void OnIsolateShutdown(void*, void*) {
   Dart_EnterScope();
   Dart_Handle sticky_error = Dart_GetStickyError();
   if (!Dart_IsNull(sticky_error) && !Dart_IsFatalError(sticky_error)) {
-    std::cerr << "Error shutting down isolate: " << Dart_GetError(sticky_error) << std::endl;
+    std::cerr << "Error shutting down isolate: " << Dart_GetError(sticky_error)
+              << std::endl;
   }
   Dart_ExitScope();
 }
@@ -98,6 +99,8 @@ static void DeleteIsolateGroupData(void* callback_data) {
   auto isolate_group_data = reinterpret_cast<IsolateGroupData*>(callback_data);
   delete isolate_group_data;
 }
+
+extern "C" {
 
 bool DartDll_Initialize() {
   std::cout << "Initializig Dart ---- \n";
@@ -130,19 +133,21 @@ bool DartDll_Initialize() {
 
   char* initError = Dart_Initialize(&params);
 
-  std::cout << "Dart initialized, error was: " << (initError != nullptr ? initError : "null") << std::endl;
+  std::cout << "Dart initialized, error was: "
+            << (initError != nullptr ? initError : "null") << std::endl;
 
   return true;
 }
 
-Dart_Isolate DartDll_LoadScript(const char* script_uri, const char* package_config) {
+Dart_Isolate DartDll_LoadScript(const char* script_uri,
+                                const char* package_config) {
   Dart_IsolateFlags isolate_flags;
   Dart_IsolateFlagsInitialize(&isolate_flags);
 
   char* error = nullptr;
   Dart_Isolate isolate = CreateIsolate(true, script_uri, "main", package_config,
                                        &isolate_flags, nullptr, &error);
-  
+
   return isolate;
 }
 
@@ -164,8 +169,8 @@ Dart_Handle DartDll_RunMain(Dart_Handle library) {
       Dart_Invoke(isolateLib, Dart_NewStringFromCString("_startMainIsolate"),
                   kNumIsolateArgs, isolateArgs);
   if (Dart_IsError(result)) {
-    std::cout << "Dart initialized, error was: "
-              << Dart_GetError(result) << std::endl;
+    std::cout << "Dart initialized, error was: " << Dart_GetError(result)
+              << std::endl;
     return result;
   }
 
@@ -197,10 +202,9 @@ Dart_Handle DartDll_DrainMicrotaskQueue() {
   }
   result = Dart_HandleMessage();
   if (Dart_IsError(result)) {
-    std::cerr << "Error draining microtask queue: %s",
-                  Dart_GetError(result);
+    std::cerr << "Error draining microtask queue: %s" << Dart_GetError(result);
     return result;
-  } 
+  }
 
   Dart_ExitScope();
 
@@ -217,4 +221,5 @@ bool DartDll_Shutdown() {
   dart::embedder::Cleanup();
 
   return true;
+}
 }

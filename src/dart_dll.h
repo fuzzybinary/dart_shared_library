@@ -13,6 +13,8 @@ typedef struct _Dart_Handle* Dart_Handle;
   #define DART_DLL_EXPORT
 #endif
 
+extern "C" {
+
 // Initialize Dart
 DART_DLL_EXPORT bool DartDll_Initialize();
 
@@ -33,3 +35,5 @@ DART_DLL_EXPORT Dart_Handle DartDll_DrainMicrotaskQueue();
 
 // Shutdown Dart
 DART_DLL_EXPORT bool DartDll_Shutdown();
+
+}
