@@ -13,6 +13,8 @@
 
 using namespace dart::bin;
 
+static DartDllConfig _dart_dll_config;
+
 extern "C" {
 extern const uint8_t kDartVmSnapshotData[];
 extern const uint8_t kDartVmSnapshotInstructions[];
@@ -51,7 +53,8 @@ static Dart_Isolate CreateIsolateGroupAndSetup(const char* script_uri,
                                flags, callback_data, error);
   } else if (0 == strcmp(script_uri, DART_VM_SERVICE_ISOLATE_NAME)) {
     return CreateVmServiceIsolate(script_uri, main, package_root,
-                                  package_config, flags, callback_data, error);
+                                  package_config, flags, callback_data,
+                                  _dart_dll_config.service_port, error);
   } else {
     return CreateIsolate(false, script_uri, main, package_config, flags,
                          callback_data, error);
@@ -102,7 +105,7 @@ static void DeleteIsolateGroupData(void* callback_data) {
 
 extern "C" {
 
-bool DartDll_Initialize() {
+bool DartDll_Initialize(const DartDllConfig& config) {
   std::cout << "Initializig Dart ---- \n";
 
   Dart_SetVMFlags(0, nullptr);
@@ -112,6 +115,9 @@ bool DartDll_Initialize() {
     std::cerr << "Dart initialization failed: " << error << std::endl;
     return false;
   }
+
+  // copy the configuration
+  memcpy(&_dart_dll_config, &config, sizeof(DartDllConfig));
 
   dfe.Init();
   dfe.set_use_dfe();

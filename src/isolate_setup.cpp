@@ -100,6 +100,7 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
                                     const char* package_config,
                                     Dart_IsolateFlags* flags,
                                     void* callback_data,
+                                    int service_port,
                                     char** error) {
   IsolateGroupData* isolate_group_data =
       new IsolateGroupData(script_uri, package_config, nullptr, false);
@@ -114,7 +115,7 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
                                               isolate_group_data, isolate_data};
 
   dart::embedder::VmServiceConfiguration vm_config = {
-      "127.0.0.1", 5858, nullptr, true, true, true};
+      "127.0.0.1", service_port, nullptr, true, true, true};
 
   Dart_Isolate isolate = dart::embedder::CreateVmServiceIsolate(
       data, vm_config, isolate_snapshot_data, isolate_snapshot_instructions,

@@ -16,6 +16,7 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
                                     const char* package_config,
                                     Dart_IsolateFlags* flags,
                                     void* callback_data,
+                                    int service_port,
                                     char** error);
 
 Dart_Isolate CreateIsolate(bool is_main_isolate,

@@ -43,7 +43,10 @@ Dart_NativeFunction ResolveNativeFunction(Dart_Handle name,
 
 int main() {
   // Initialize Dart
-  if (!DartDll_Initialize()) {
+  DartDllConfig config;
+  config.service_port = 6222;
+
+  if (!DartDll_Initialize(config)) {
     return -1;
   }
 

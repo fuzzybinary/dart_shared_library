@@ -28,7 +28,7 @@ void* ResolveNativeFunction(const char* name, uintptr_t args_n) {
 
 int main() {
   // Initialize Dart
-  if (!DartDll_Initialize()) {
+  if (!DartDll_Initialize(DartDllConfig())) {
     return -1;
   }
 

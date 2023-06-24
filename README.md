@@ -31,6 +31,7 @@ You need
 * git
 * All the things to get Dart source - https://github.com/dart-lang/sdk/wiki/Building#source
 * C++ build tools for your platform (Visual Studio, XCode, gcc, etc)
+* CMake
 
 ## Contributing
 
@@ -45,19 +46,15 @@ This section is as much for my benefit as for yours. Eventually, I hope to make 
   * On Windows, these are set with the `setup_env.ps1` script. Specifically, you need to set `GYP_MSVS_OVERRIDE_PATH`, `GYP_MSVS_VERSION`, and `DEPOT_TOOLS_WIN_TOOLCHAIN=0`
 * Builds libdart with:
   ```bash
-  python ./tools/build.py --no-goma -m release libdart
+  # On windows, you will need to add `python` in front
+  ./tools/build.py --no-goma -m release libdart
   ```
 * Revert the changes made to build files to leave a clean copy of the dart-sdk (this makes updating easier)
-* Generate build scripts with genie:
-  ```bash
-  // Windows
-  tools/win/genie.exe vs2022
-  // MacOS
-  ./tools/mac/genie xcode11
-  ```
-* Open the generated build files (in ./.build/projects/[arch_platform]) and build the project.
-* Build.
-* Run one of the examples!
+* Build with CMake:
+```
+cmake -B ./.build .
+cmake --build ./.build
+```
 
 Updating the dart-sdk
 * Make sure environment variables are set (`setup_env.ps1`)
