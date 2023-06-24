@@ -4,8 +4,9 @@ project(dart_dll VERSION 0.1)
 
 set(DART_DIR "${PROJECT_SOURCE_DIR}/../dart-sdk/sdk")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS )
 
 add_library(dart_dll SHARED
     dart_dll.cpp
@@ -16,8 +17,13 @@ target_include_directories(dart_dll PUBLIC
     "${DART_DIR}/runtime"
 )
 
+if(WIN32)
+    set(LIB_PREFIX "lib")
+endif()
+
+
 find_library(LIB_DART
-    NAMES libdart
+    NAMES "${LIB_PREFIX}dart"
     HINTS "${DART_DIR}/out/ReleaseX64/obj/runtime/bin"
 )
 
@@ -51,6 +57,18 @@ if(WIN32)
         Iphlpapi
         Psapi
         shlwapi
+    )
+elseif(LINUX)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    set(CMAKE_C_COMPILER "${DART_DIR}/buildtools/linux-x64/clang/bin/clang")
+    set(CMAKE_CXX_COMPILER "${DART_DIR}/buildtools/linux-x64/clang/bin/clang++")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -nostdlib++ ${DART_DIR}/buildtools/linux-x64/clang/lib/x86_64-unknown-linux-gnu/libc++.a")
+    #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+
+    find_package(Threads REQUIRED)
+    target_link_libraries(dart_dll 
+        Threads::Threads
+        ${CMAKE_DL_LIBS}
     )
 endif()
 
