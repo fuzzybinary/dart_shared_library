@@ -33,7 +33,11 @@ DART_DLL_EXPORT bool DartDll_Initialize(const DartDllConfig& config);
 // Load a script, with an optional package configuration location. The package
 // configuration is usually in ".dart_tool/package_config.json".
 DART_DLL_EXPORT Dart_Isolate DartDll_LoadScript(const char* script_uri,
-                                        const char* package_config);
+                                                const char* package_config,
+                                                void* callbackPtr = nullptr);
+
+// Gets the pointer provided in DartDll_LoadScript after calling Dart_CurrentIsolateData
+DART_DLL_EXPORT void* DartDll_GetCallbackData(void* isolate_group_data);
 
 // Run "main" from the supplied library, usually one you got from
 // Dart_RootLibrary()

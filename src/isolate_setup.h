@@ -26,3 +26,5 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
                            Dart_IsolateFlags* flags,
                            void* callback_data,
                            char** error);
+
+void* GetCallbackData(void* isolate_group_data);

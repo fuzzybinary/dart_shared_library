@@ -146,15 +146,20 @@ bool DartDll_Initialize(const DartDllConfig& config) {
 }
 
 Dart_Isolate DartDll_LoadScript(const char* script_uri,
-                                const char* package_config) {
+                                const char* package_config,
+								void* callbackPtr) {
   Dart_IsolateFlags isolate_flags;
   Dart_IsolateFlagsInitialize(&isolate_flags);
 
   char* error = nullptr;
   Dart_Isolate isolate = CreateIsolate(true, script_uri, "main", package_config,
-                                       &isolate_flags, nullptr, &error);
+                                       &isolate_flags, callbackPtr, &error);
 
   return isolate;
+}
+
+void* DartDll_GetCallbackData(void* isolate_group_data) {
+  return GetCallbackData(isolate_group_data);
 }
 
 Dart_Handle DartDll_RunMain(Dart_Handle library) {
@@ -175,7 +180,7 @@ Dart_Handle DartDll_RunMain(Dart_Handle library) {
       Dart_Invoke(isolateLib, Dart_NewStringFromCString("_startMainIsolate"),
                   kNumIsolateArgs, isolateArgs);
   if (Dart_IsError(result)) {
-    std::cout << "Dart initialized, error was: " << Dart_GetError(result)
+    std::cout << "Dart initialized, error was: " << Dart_GetError(result) << "\n"
               << std::endl;
     return result;
   }
