@@ -19,17 +19,22 @@ extern const uint8_t kDartCoreIsolateSnapshotInstructions[];
 
 namespace {
     class DllIsolateGroupData : public IsolateGroupData {
-        public:
-            DllIsolateGroupData(const char* url,
-                const char* packages_file,
-                AppSnapshot* app_snapshot,
-                bool isolate_run_app_snapshot)
-                : IsolateGroupData(url, packages_file, app_snapshot, isolate_run_app_snapshot) {
-            }
+     public:
+      DllIsolateGroupData(const char* url,
+                          const char* packages_file,
+                          AppSnapshot* app_snapshot,
+                          bool isolate_run_app_snapshot,
+                          void* callback_data = nullptr)
+          : IsolateGroupData(url,
+                             packages_file,
+                             app_snapshot,
+                             isolate_run_app_snapshot),
+            callback_data(callback_data) {}
 
-            void* callback_data = {};
+      void* callback_data;
     };
 }
+
 Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
                                IsolateData* isolate_data,
                                bool is_isolate_group_start,
@@ -115,8 +120,8 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
                                     void* callback_data,
                                     int service_port,
                                     char** error) {
-  DllIsolateGroupData* isolate_group_data =
-      new DllIsolateGroupData(script_uri, package_config, nullptr, false);
+  DllIsolateGroupData* isolate_group_data = new DllIsolateGroupData(
+      script_uri, package_config, nullptr, false, callback_data);
   IsolateData* isolate_data = new IsolateData(isolate_group_data);
 
   flags->load_vmservice_library = true;
@@ -160,11 +165,10 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
   dfe.ReadScript(script_uri, &kernel_buffer, &kernel_buffer_size);
   flags->null_safety = true;
 
-  DllIsolateGroupData* isolate_group_data =
-      new DllIsolateGroupData(script_uri, packages_config, nullptr, false);
+  DllIsolateGroupData* isolate_group_data = new DllIsolateGroupData(
+      script_uri, packages_config, nullptr, false, callback_data);
   isolate_group_data->SetKernelBufferNewlyOwned(kernel_buffer,
                                                 kernel_buffer_size);
-  isolate_group_data->callback_data = callback_data;
 
   const uint8_t* platform_kernel_buffer = nullptr;
   intptr_t platform_kernel_buffer_size = 0;
@@ -258,15 +262,26 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
   return isolate;
 }
 
-void* GetCallbackData(void* isolate_data) {
+void* GetUserIsolateData(void* isolate_data) {
   if (isolate_data == nullptr) {
     return nullptr;
   }
-  IsolateGroupData* isolate_group_data = static_cast<IsolateData*>(isolate_data)->isolate_group_data();
-  
+  IsolateGroupData* isolate_group_data =
+      reinterpret_cast<IsolateData*>(isolate_data)->isolate_group_data();
+
   if (isolate_group_data == nullptr) {
     return nullptr;
   }
-  void* callback_data = static_cast<DllIsolateGroupData*>(isolate_group_data)->callback_data;
-  return callback_data;
+  return static_cast<DllIsolateGroupData*>(isolate_group_data)->callback_data;
+}
+
+void DeleteIsolateData(void* raw_isolate_group_data, void* raw_isolate_data) {
+  auto isolate_data = reinterpret_cast<IsolateData*>(raw_isolate_data);
+  delete isolate_data;
+}
+
+void DeleteIsolateGroupData(void* raw_isolate_group_data) {
+  auto isolate_group_data =
+      reinterpret_cast<DllIsolateGroupData*>(raw_isolate_group_data);
+  delete isolate_group_data;
 }

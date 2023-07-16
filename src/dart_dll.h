@@ -34,10 +34,11 @@ DART_DLL_EXPORT bool DartDll_Initialize(const DartDllConfig& config);
 // configuration is usually in ".dart_tool/package_config.json".
 DART_DLL_EXPORT Dart_Isolate DartDll_LoadScript(const char* script_uri,
                                                 const char* package_config,
-                                                void* callbackPtr = nullptr);
+                                                void* isolate_data = nullptr);
 
-// Gets the pointer provided in DartDll_LoadScript after calling Dart_CurrentIsolateData
-DART_DLL_EXPORT void* DartDll_GetCallbackData(void* isolate_group_data);
+// Gets the pointer provided by the `isolate_data` parameter in DartDll_LoadScript after
+// calling Dart_CurrentIsolateData
+DART_DLL_EXPORT void* DartDll_GetUserIsolateData(void* isolate_group_data);
 
 // Run "main" from the supplied library, usually one you got from
 // Dart_RootLibrary()
@@ -51,5 +52,4 @@ DART_DLL_EXPORT Dart_Handle DartDll_DrainMicrotaskQueue();
 
 // Shutdown Dart
 DART_DLL_EXPORT bool DartDll_Shutdown();
-
 }
