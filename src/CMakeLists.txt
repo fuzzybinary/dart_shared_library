@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 
 project(dart_dll VERSION 0.1)
 
-set(DART_DIR "${PROJECT_SOURCE_DIR}/../dart-sdk/sdk")
+set(DARTSDK_ROOTDIR "${PROJECT_SOURCE_DIR}/../dart-sdk" CACHE FILEPATH "Directory that dart-sdk is cloned too")
+set(DART_DIR "${DARTSDK_ROOTDIR}/sdk")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -21,8 +22,12 @@ if(WIN32)
     set(LIB_PREFIX "lib")
 endif()
 
+find_library(LIB_DART_DEBUG
+    NAMES "${LIB_PREFIX}dart"
+    HINTS "${DART_DIR}/out/DebugX64/obj/runtime/bin"
+)
 
-find_library(LIB_DART
+find_library(LIB_DART_RELEASE
     NAMES "${LIB_PREFIX}dart"
     HINTS "${DART_DIR}/out/ReleaseX64/obj/runtime/bin"
 )
@@ -58,6 +63,8 @@ if(WIN32)
         Psapi
         shlwapi
     )
+    set_property(TARGET dart_dll PROPERTY
+             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(LINUX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     set(CMAKE_C_COMPILER "${DART_DIR}/buildtools/linux-x64/clang/bin/clang")
@@ -72,6 +79,5 @@ elseif(LINUX)
     )
 endif()
 
-target_link_libraries(dart_dll
-    ${LIB_DART}
-)
+target_link_libraries(dart_dll debug ${LIB_DART_DEBUG})
+target_link_libraries(dart_dll optimized ${LIB_DART_RELEASE})

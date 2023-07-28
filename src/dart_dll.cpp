@@ -93,15 +93,7 @@ static void OnIsolateShutdown(void*, void*) {
   Dart_ExitScope();
 }
 
-static void DeleteIsolateData(void*, void* callback_data) {
-  auto isolate_data = reinterpret_cast<IsolateData*>(callback_data);
-  delete isolate_data;
-}
 
-static void DeleteIsolateGroupData(void* callback_data) {
-  auto isolate_group_data = reinterpret_cast<IsolateGroupData*>(callback_data);
-  delete isolate_group_data;
-}
 
 extern "C" {
 
@@ -146,15 +138,20 @@ bool DartDll_Initialize(const DartDllConfig& config) {
 }
 
 Dart_Isolate DartDll_LoadScript(const char* script_uri,
-                                const char* package_config) {
+                                const char* package_config,
+                                void* isolate_data) {
   Dart_IsolateFlags isolate_flags;
   Dart_IsolateFlagsInitialize(&isolate_flags);
 
   char* error = nullptr;
   Dart_Isolate isolate = CreateIsolate(true, script_uri, "main", package_config,
-                                       &isolate_flags, nullptr, &error);
+                                       &isolate_flags, isolate_data, &error);
 
   return isolate;
+}
+
+void* DartDll_GetUserIsolateData(void* isolate_group_data) {
+  return GetUserIsolateData(isolate_group_data);
 }
 
 Dart_Handle DartDll_RunMain(Dart_Handle library) {
@@ -176,6 +173,7 @@ Dart_Handle DartDll_RunMain(Dart_Handle library) {
                   kNumIsolateArgs, isolateArgs);
   if (Dart_IsError(result)) {
     std::cout << "Dart initialized, error was: " << Dart_GetError(result)
+              << "\n"
               << std::endl;
     return result;
   }
