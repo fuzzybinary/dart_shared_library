@@ -93,8 +93,6 @@ static void OnIsolateShutdown(void*, void*) {
   Dart_ExitScope();
 }
 
-
-
 extern "C" {
 
 bool DartDll_Initialize(const DartDllConfig& config) {

@@ -18,22 +18,22 @@ extern const uint8_t kDartCoreIsolateSnapshotInstructions[];
 }
 
 namespace {
-    class DllIsolateGroupData : public IsolateGroupData {
-     public:
-      DllIsolateGroupData(const char* url,
-                          const char* packages_file,
-                          AppSnapshot* app_snapshot,
-                          bool isolate_run_app_snapshot,
-                          void* callback_data = nullptr)
-          : IsolateGroupData(url,
-                             packages_file,
-                             app_snapshot,
-                             isolate_run_app_snapshot),
-            callback_data(callback_data) {}
+class DllIsolateGroupData : public IsolateGroupData {
+ public:
+  DllIsolateGroupData(const char* url,
+                      const char* packages_file,
+                      AppSnapshot* app_snapshot,
+                      bool isolate_run_app_snapshot,
+                      void* callback_data = nullptr)
+      : IsolateGroupData(url,
+                         packages_file,
+                         app_snapshot,
+                         isolate_run_app_snapshot),
+        callback_data(callback_data) {}
 
-      void* callback_data;
-    };
-}
+  void* callback_data;
+};
+}  // namespace
 
 Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
                                IsolateData* isolate_data,
