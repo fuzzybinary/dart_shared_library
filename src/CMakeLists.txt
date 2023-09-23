@@ -79,5 +79,8 @@ elseif(LINUX)
     )
 endif()
 
-target_link_libraries(dart_dll debug ${LIB_DART_DEBUG})
+if(LIB_DART_DEBUG) 
+    target_link_libraries(dart_dll debug ${LIB_DART_DEBUG})
+endif()
+
 target_link_libraries(dart_dll optimized ${LIB_DART_RELEASE})

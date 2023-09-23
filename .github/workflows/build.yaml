@@ -1,0 +1,22 @@
+name: Build Dart Shared Library
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build_windows:
+    runs-on: [windows-latest]
+    env:
+      DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+      - uses: ilammy/msvc-dev-cmd@v1
+      - run: dart pub get
+        working-directory: ./scripts/build_helpers
+      - name: Build Dart
+        run: dart ./scripts/build_helpers/bin/build_dart.dart
+      - uses: threeal/cmake-action@v1.3.0
+      - name: Build Shared Library
+        run: cmake --build build --config release

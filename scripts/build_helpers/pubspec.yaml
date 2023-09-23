@@ -1,0 +1,17 @@
+name: build_helpers
+description: Script to help build the Dart Shared Library
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.6
+
+# Add regular dependencies here.
+dependencies:
+  args: ^2.4.2
+  path: ^1.8.0
+  logger: ^2.0.2
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0

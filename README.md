@@ -8,9 +8,8 @@ The hope is that the the dynamic library will eventually support the following t
 * A "Fully Featured" .dll / .so that supports booting Dart in different configurations:
   * Boot (or not) the service and kernel isolates
   * Support Dart Source Compilation and / or Kernel Isolates
-  * Support "AOT only" mode? (aka, just the runtime)
-* A JIT Only .dll / .so
-* A AOT Only .dll / .so (aka, just the runtime)
+  * JIT from source or .dil
+* An AOT Only .dll / .so
 
 Additionally we may have a static target that uses the same interface as the dynamic library, so the VM can be embedded on platforms that don't support dynamic linking.
 
