@@ -4,5 +4,8 @@
         "**/.DS_Store": true,    // this is a default value
 
         "dart-sdk/": true
-    }
+    },
+    "dart.analysisExcludedFolders": [
+        "dart-sdk"
+    ]
 }
