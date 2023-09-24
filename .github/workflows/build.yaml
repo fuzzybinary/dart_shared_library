@@ -9,6 +9,11 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            postfix: win
+          - os: ubuntu-latest
+            postfix: linux
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
     continue-on-error: true
@@ -27,6 +32,8 @@ jobs:
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:
-          name: libs
-          path: ./build/src/Release/
+          name: libs-${{ matrix.postfix }}
+          path: |
+            ./build/src/Release/
+            ./build/src/*.so
   

@@ -1,8 +1,8 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 40bd3062436..159239e17e2 100644
+index 4d88fd67d86..5898483f0e9 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -95,6 +95,10 @@ group("create_sdk") {
+@@ -99,6 +99,10 @@ group("create_sdk") {
    public_deps = [ "sdk:create_sdk" ]
  }
  
@@ -13,11 +13,26 @@ index 40bd3062436..159239e17e2 100644
  group("create_platform_sdk") {
    public_deps = [ "sdk:create_platform_sdk" ]
  }
+diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
+index f6c2c6625dc..f3986381da4 100644
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -250,8 +250,8 @@ config("compiler") {
+   }
+ 
+   if (is_android || is_linux || is_mac || is_fuchsia) {
+-    cflags += [ "-fPIE" ]
+-    ldflags += [ "-fPIE" ]
++    cflags += [ "-fPIC" ]
++    ldflags += [ "-fPIC" ]
+   }
+ 
+   # Linux-specific compiler flags setup.
 diff --git a/runtime/bin/BUILD.gn b/runtime/bin/BUILD.gn
-index 2877fb33775..e37f18bd2f1 100644
+index e757b71d483..aa10a453907 100644
 --- a/runtime/bin/BUILD.gn
 +++ b/runtime/bin/BUILD.gn
-@@ -1107,3 +1107,49 @@ if (defined(is_linux) && is_linux && defined(is_asan) && is_asan &&
+@@ -1110,3 +1110,49 @@ if (defined(is_linux) && is_linux && defined(is_asan) && is_asan &&
      }
    }
  }
