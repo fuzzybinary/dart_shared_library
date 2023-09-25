@@ -8,12 +8,14 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
         include:
           - os: windows-latest
             postfix: win
           - os: ubuntu-latest
             postfix: linux
+          - os: macos-latest
+            postfix: macos-x64
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
     continue-on-error: true
@@ -29,11 +31,11 @@ jobs:
       - uses: threeal/cmake-action@v1.3.0
       - name: Build Shared Library
         run: cmake --build build --config release
+      - name: Assemble artifacts
+        run: dart ./scripts/build_helpers/bin/assemble_artifacts.dart
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:
-          name: libs-${{ matrix.postfix }}
-          path: |
-            ./build/src/Release/
-            ./build/src/*.so
+          name: lib-${{ matrix.postfix }}
+          path: ./artifacts
   

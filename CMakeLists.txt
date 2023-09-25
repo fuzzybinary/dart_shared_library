@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(Tutorial VERSION 0.1)
+project(DartSharedLibrary VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

@@ -15,6 +15,7 @@ void main(List<String> args) async {
   if (argResults['verbose'] == true) {
     logLevel = Level.debug;
   }
+  BuildToolsLogger.initLogger(logLevel: logLevel);
 
   if (!checkRightDirectory()) {
     // Not run from root. Exit.
@@ -30,7 +31,6 @@ void main(List<String> args) async {
     }
   }
 
-  BuildToolsLogger.initLogger(logLevel: logLevel);
   if (!await checkForDepotTools()) {
     if (!await getDepotTools()) {
       // Fatal. Can't do this without depot_tools

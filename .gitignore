@@ -1,2 +1,3 @@
 dart-sdk/*
 .build/*
+artifacts/*
