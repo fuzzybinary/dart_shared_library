@@ -1,5 +1,5 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 4d88fd67d86..5898483f0e9 100644
+index 233a0900e55..5010af8fc55 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
 @@ -99,6 +99,10 @@ group("create_sdk") {
@@ -14,25 +14,26 @@ index 4d88fd67d86..5898483f0e9 100644
    public_deps = [ "sdk:create_platform_sdk" ]
  }
 diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
-index f6c2c6625dc..f3986381da4 100644
+index fb45d1ec551..9ccb1a27f4a 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -250,8 +250,8 @@ config("compiler") {
+@@ -269,8 +269,9 @@ config("compiler") {
+       cflags += [ "-fPIC" ]
+       ldflags += [ "-fPIC" ]
+     } else {
+-      cflags += [ "-fPIE" ]
+-      ldflags += [ "-fPIE" ]
++      # dart_shared_library overriden - we need -fPIC to properly build
++      cflags += [ "-fPIC" ]
++      ldflags += [ "-fPIC" ]
+     }
    }
  
-   if (is_android || is_linux || is_mac || is_fuchsia) {
--    cflags += [ "-fPIE" ]
--    ldflags += [ "-fPIE" ]
-+    cflags += [ "-fPIC" ]
-+    ldflags += [ "-fPIC" ]
-   }
- 
-   # Linux-specific compiler flags setup.
 diff --git a/runtime/bin/BUILD.gn b/runtime/bin/BUILD.gn
-index e757b71d483..aa10a453907 100644
+index 91ebf8feb65..4ecf43807d4 100644
 --- a/runtime/bin/BUILD.gn
 +++ b/runtime/bin/BUILD.gn
-@@ -1110,3 +1110,49 @@ if (defined(is_linux) && is_linux && defined(is_asan) && is_asan &&
+@@ -1143,3 +1143,47 @@ if (defined(is_linux) && is_linux && defined(is_asan) && is_asan &&
      }
    }
  }
@@ -53,10 +54,6 @@ index e757b71d483..aa10a453907 100644
 +
 +  complete_static_lib = true
 +
-+  if (dart_use_tcmalloc) {
-+    deps += [ "//third_party/tcmalloc" ]
-+  }
-+
 +  include_dirs = [
 +    "..",
 +    "//third_party",
@@ -72,6 +69,8 @@ index e757b71d483..aa10a453907 100644
 +    "snapshot_utils.h",
 +    "gzip.cc",
 +    "gzip.h",
++    "dartdev_isolate.cc",
++    "dartdev_isolate.h",
 +    "dfe.cc",
 +    "dfe.h",
 +    "loader.cc",
