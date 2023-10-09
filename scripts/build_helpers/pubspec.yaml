@@ -6,7 +6,6 @@ publish_to: none
 environment:
   sdk: ^3.0.6
 
-# Add regular dependencies here.
 dependencies:
   args: ^2.4.2
   path: ^1.8.0
