@@ -47,7 +47,10 @@ void main(List<String> args) async {
       exit(-1);
     }
 
-    if (!await _buildDart()) {
+    if (!await _buildDart('release')) {
+      exit(-1);
+    }
+    if (!await _buildDart('debug')) {
       exit(-1);
     }
   } catch (e) {
@@ -135,12 +138,12 @@ Future<bool> _patchDartSdk() async {
   return result == 0;
 }
 
-Future<bool> _buildDart() async {
+Future<bool> _buildDart(String buildType) async {
   final logger = BuildToolsLogger.shared;
   final result = await inDir('dart-sdk/sdk', () async {
     logger.i("Building libdart");
     var script = './tools/build.py';
-    var args = ['--no-goma', '-m', 'release', 'libdart'];
+    var args = ['--no-goma', '-m', buildType, 'libdart'];
     var command = script;
     if (Platform.isWindows) {
       command = 'python';
