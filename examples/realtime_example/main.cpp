@@ -20,6 +20,7 @@ bool init_dart() {
   DartDllConfig config;
   DartDll_Initialize(config);
 
+  //if package_config.json not exits run pub get
   _dart_isolate = DartDll_LoadScript("dart/main.dart",
                                      "dart/.dart_tool/package_config.json");
   if (_dart_isolate == nullptr) {

@@ -5,10 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dart: Attach to Simple",
-            "type": "dart",
-            "request": "attach",
-            "vmServiceUri": "http://127.0.0.1:5858/"
+            
+            "name": "(WIN)RealTime Sample",
+            "type": "cppvsdbg",
+            "request": "launch",
+            //"preLaunchTask": "buildSimpelTest",
+            "program": "${workspaceFolder}/build/Debug/realtime_example.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
         }
     ]
 }
