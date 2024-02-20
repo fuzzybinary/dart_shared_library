@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(dart_dll VERSION 0.1)
+project(dart_dll VERSION 0.1.2)
 
 set(DARTSDK_ROOTDIR "${PROJECT_SOURCE_DIR}/../dart-sdk" CACHE FILEPATH "Directory that dart-sdk is cloned too")
 set(DART_DIR "${DARTSDK_ROOTDIR}/sdk")
@@ -22,6 +22,8 @@ if(WIN32)
     set(LIB_PREFIX "lib")
 endif()
 
+MESSAGE(STATUS "Dart SDK ${DART_DIR}")
+
 find_library(LIB_DART_DEBUG
     NAMES "${LIB_PREFIX}dart"
     HINTS "${DART_DIR}/out/DebugX64/obj/runtime/bin" "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
@@ -30,6 +32,14 @@ find_library(LIB_DART_DEBUG
 find_library(LIB_DART_RELEASE
     NAMES "${LIB_PREFIX}dart"
     HINTS "${DART_DIR}/out/ReleaseX64/obj/runtime/bin" "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
+)
+
+add_custom_command(TARGET dart_dll
+    # On Visual Studio Generators, run before any other rules are executed within the target. On other generators, run just before PRE_LINK commands
+    PRE_BUILD
+    COMMAND echo -e "\texecuting a PRE_BUILD command"
+    COMMENT "Building Dart bevor Lib"
+    VERBATIM # to support \t for example
 )
 
 target_compile_definitions(dart_dll PRIVATE
