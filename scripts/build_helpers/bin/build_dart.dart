@@ -8,14 +8,33 @@ import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   final parser = ArgParser();
-  parser.addFlag('verbose', abbr: 'v');
+  parser.addFlag('verbose', abbr: 'v', help: 'enable all debug');
+  parser.addOption('buildType',
+      abbr: 't',
+      help: 'build typ release or debug. all for both',
+      allowed: ['all', 'debug', 'release']);
 
-  final argResults = parser.parse(args);
+  ArgResults? argResults;
+  try {
+    argResults = parser.parse(args);
+  } catch (error) {
+    if (error is! FormatException) rethrow;
+    print(parser.usage);
+    exit(-1);
+  }
+
   Level logLevel = Level.info;
   if (argResults['verbose'] == true) {
-    logLevel = Level.debug;
+    logLevel = Level.all;
   }
-  BuildToolsLogger.initLogger(logLevel: logLevel);
+
+  BuildToolsLogger.initLogger(
+    logLevel: logLevel,
+  );
+
+  String buildType = argResults['buildType'] ?? "all";
+
+  BuildToolsLogger.shared.d('Build Typ $buildType');
 
   if (!checkRightDirectory()) {
     // Not run from root. Exit.
@@ -47,11 +66,21 @@ void main(List<String> args) async {
       exit(-1);
     }
 
-    if (!await _buildDart('release')) {
-      exit(-1);
-    }
-    if (!await _buildDart('debug')) {
-      exit(-1);
+    if (buildType == "all") {
+      if (!await _buildDart('release')) {
+        exit(-1);
+      }
+      if (!await _buildDart('debug')) {
+        exit(-1);
+      }
+    } else if (buildType == "release") {
+      if (!await _buildDart('release')) {
+        exit(-1);
+      }
+    } else if (buildType == "debug") {
+      if (!await _buildDart('debug')) {
+        exit(-1);
+      }
     }
   } catch (e) {
     BuildToolsLogger.shared.f('Caught an exception building the Dart SDK:');
@@ -128,7 +157,7 @@ Future<bool> _patchDartSdk() async {
     logger.i("Patching the Dart SDK to create libdart");
     var result = await Process.run('git', ['apply', '../../dart_sdk.patch'],
         runInShell: true);
-    logger.d(result.stdout);
+    logger.d('Patch result is ${result.exitCode}');
     return result.exitCode;
   });
   if (result != 0) {
@@ -140,6 +169,7 @@ Future<bool> _patchDartSdk() async {
 
 Future<bool> _buildDart(String buildType) async {
   final logger = BuildToolsLogger.shared;
+  logger.d('starting build for $buildType');
   final result = await inDir('dart-sdk/sdk', () async {
     logger.i("Building libdart");
     var script = './tools/build.py';

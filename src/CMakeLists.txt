@@ -34,14 +34,6 @@ find_library(LIB_DART_RELEASE
     HINTS "${DART_DIR}/out/ReleaseX64/obj/runtime/bin" "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
 )
 
-add_custom_command(TARGET dart_dll
-    # On Visual Studio Generators, run before any other rules are executed within the target. On other generators, run just before PRE_LINK commands
-    PRE_BUILD
-    COMMAND echo -e "\texecuting a PRE_BUILD command"
-    COMMENT "Building Dart bevor Lib"
-    VERBATIM # to support \t for example
-)
-
 target_compile_definitions(dart_dll PRIVATE
     __STDC_LIMIT_MACROS
     __STDC_FORMAT_MACROS

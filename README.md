@@ -28,7 +28,11 @@ You need:
 * git
 * Dart 3+
 * C++ build tools for your platform (Visual Studio, XCode, gcc, etc) 
-* For Windows VS 2019 16.61 with 10.0.20348.0 SDK don't forget install Debugger Tools
+* For Windows 
+  * 2019 16.61 with 10.0.20348.0 SDK don't forget install Debugger Tools
+  * 2022 17 with ? SDK don't forget install Debugger Tools
+  * 2017 15 with ? SDK don't forget install Debugger Tools
+  * see dart-sdk\sdk\build\vs_toolchain.py
 * CMake
 
 Optionally, I recommend installing [`depot_tools`](https://www.chromium.org/developers/how-tos/depottools/) and making sure it is on your path before running setup scripts. Without depot_tools, the scripts will download them anyway, but having them already set up will save you some time with subsequent builds.
@@ -39,6 +43,9 @@ Optionally, I recommend installing [`depot_tools`](https://www.chromium.org/deve
 > This will set up some environment variables that will be needed to build Dart properly.
 
 The first step is to build a statically linkable verison of Dart. This requires that we download Dart, patch some of the Dart build files, and then run the actual build. Thankfully there is a Dart script to do this.
+build_dart commandline 
+ * -v -> Verbose Log
+ * -t -> Build Type all, release, debug
 
 ```bash
 cd ./scripts/build_helpers

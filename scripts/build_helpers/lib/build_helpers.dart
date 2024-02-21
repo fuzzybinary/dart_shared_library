@@ -15,11 +15,12 @@ class BuildToolsLogger {
   }
 
   static Logger initLogger({Level logLevel = Level.info}) {
-    return Logger(
+    _shared = Logger(
       filter: ProductionFilter(),
       level: logLevel,
       printer: SimplePrinter(),
     );
+    return shared;
   }
 }
 
