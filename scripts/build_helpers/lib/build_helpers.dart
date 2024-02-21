@@ -10,12 +10,14 @@ export 'depot_tools.dart';
 class BuildToolsLogger {
   static Logger? _shared;
   static Logger get shared {
-    _shared ??= initLogger();
+    if (_shared == null) {
+      initLogger();
+    }
     return _shared!;
   }
 
-  static Logger initLogger({Level logLevel = Level.info}) {
-    return Logger(
+  static void initLogger({Level logLevel = Level.info}) {
+    _shared = Logger(
       filter: ProductionFilter(),
       level: logLevel,
       printer: SimplePrinter(),

@@ -8,18 +8,44 @@ import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   final parser = ArgParser();
-  parser.addFlag('verbose', abbr: 'v');
+  parser.addFlag('verbose', abbr: 'v', help: 'Enable verbose logging');
+  parser.addMultiOption(
+    'target',
+    abbr: 't',
+    help: 'Target to build (release or debug)',
+    allowed: ['debug', 'release', 'all'],
+    defaultsTo: ['release'],
+  );
+  parser.addFlag('help', abbr: 'h');
 
-  final argResults = parser.parse(args);
+  final ArgResults argResults;
+  try {
+    argResults = parser.parse(args);
+  } on FormatException catch (e) {
+    BuildToolsLogger.shared.w(e.message);
+    print(parser.usage);
+    exit(-1);
+  }
+
+  if (argResults['help'] == true) {
+    print(parser.usage);
+    return;
+  }
+
   Level logLevel = Level.info;
   if (argResults['verbose'] == true) {
-    logLevel = Level.debug;
+    logLevel = Level.all;
   }
   BuildToolsLogger.initLogger(logLevel: logLevel);
 
   if (!checkRightDirectory()) {
     // Not run from root. Exit.
     exit(-1);
+  }
+
+  var buildTargets = argResults['target'] as List<String>;
+  if (buildTargets.contains('all')) {
+    buildTargets = ['debug', 'release'];
   }
 
   if (Platform.isWindows) {
@@ -47,8 +73,10 @@ void main(List<String> args) async {
       exit(-1);
     }
 
-    if (!await _buildDart()) {
-      exit(-1);
+    for (var target in buildTargets) {
+      if (!await _buildDart(target)) {
+        exit(-1);
+      }
     }
   } catch (e) {
     BuildToolsLogger.shared.f('Caught an exception building the Dart SDK:');
@@ -135,12 +163,14 @@ Future<bool> _patchDartSdk() async {
   return result == 0;
 }
 
-Future<bool> _buildDart() async {
+Future<bool> _buildDart(String target) async {
   final logger = BuildToolsLogger.shared;
+  logger.i('Building dart-sdk target `$target`');
+
   final result = await inDir('dart-sdk/sdk', () async {
     logger.i("Building libdart");
     var script = './tools/build.py';
-    var args = ['--no-goma', '-m', 'release', 'libdart'];
+    var args = ['--no-goma', '-m', target, 'libdart'];
     var command = script;
     if (Platform.isWindows) {
       command = 'python';
