@@ -27,7 +27,7 @@ jobs:
       - run: dart pub get
         working-directory: ./scripts/build_helpers
       - name: Build Dart
-        run: dart ./scripts/build_helpers/bin/build_dart.dart
+        run: dart ./scripts/build_helpers/bin/build_dart.dart -v
       - uses: threeal/cmake-action@v1.3.0
       - name: Build Shared Library
         run: cmake --build build --config release

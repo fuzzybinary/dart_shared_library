@@ -8,14 +8,45 @@ import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   final parser = ArgParser();
-  parser.addFlag('verbose', abbr: 'v');
+  parser.addFlag('verbose', abbr: 'v', help: 'enable all debug');
+  parser.addMultiOption(
+    'target',
+    abbr: 't',
+    help: 'Target to build (release or debug)',
+    allowed: ['debug', 'release', 'all'],
+    defaultsTo: ['release'],
+  );
+  parser.addFlag('help', abbr: 'h');
 
-  final argResults = parser.parse(args);
+  ArgResults? argResults;
+  try {
+    argResults = parser.parse(args);
+  } catch (error) {
+    if (error is! FormatException) rethrow;
+    print(parser.usage);
+    exit(-1);
+  }
+
+  if (argResults['help'] == true) {
+    print(parser.usage);
+    return;
+  }
+
   Level logLevel = Level.info;
   if (argResults['verbose'] == true) {
-    logLevel = Level.debug;
+    logLevel = Level.all;
   }
-  BuildToolsLogger.initLogger(logLevel: logLevel);
+
+  BuildToolsLogger.initLogger(
+    logLevel: logLevel,
+  );
+
+  var buildTargets = argResults['target'] as List<String>;
+  if (buildTargets.contains('all')) {
+    buildTargets = ['debug', 'release'];
+  }
+
+  BuildToolsLogger.shared.d('Build Targets $buildTargets');
 
   if (!checkRightDirectory()) {
     // Not run from root. Exit.
@@ -29,6 +60,10 @@ void main(List<String> args) async {
           'DEPOT_TOOLS_WIN_TOOOLCHAIN not set! Run ./setup_env.ps1 before running this script!');
       exit(-1);
     }
+    final gypMsysVersion = Platform.environment['GYP_MSVS_VERSION'];
+    final gypMsysOverridePath = Platform.environment['GYP_MSVS_OVERRIDE_PATH'];
+    BuildToolsLogger.shared.d('GYP_MSVS_VERSION $gypMsysVersion');
+    BuildToolsLogger.shared.d('GYP_MSVS_OVERRIDE_PATH $gypMsysOverridePath');
   }
 
   if (!await checkForDepotTools()) {
@@ -47,8 +82,10 @@ void main(List<String> args) async {
       exit(-1);
     }
 
-    if (!await _buildDart()) {
-      exit(-1);
+    for (var target in buildTargets) {
+      if (!await _buildDart(target)) {
+        exit(-1);
+      }
     }
   } catch (e) {
     BuildToolsLogger.shared.f('Caught an exception building the Dart SDK:');
@@ -125,7 +162,7 @@ Future<bool> _patchDartSdk() async {
     logger.i("Patching the Dart SDK to create libdart");
     var result = await Process.run('git', ['apply', '../../dart_sdk.patch'],
         runInShell: true);
-    logger.d(result.stdout);
+    logger.d('Patch result is ${result.exitCode}');
     return result.exitCode;
   });
   if (result != 0) {
@@ -135,12 +172,13 @@ Future<bool> _patchDartSdk() async {
   return result == 0;
 }
 
-Future<bool> _buildDart() async {
+Future<bool> _buildDart(String buildType) async {
   final logger = BuildToolsLogger.shared;
+  logger.d('starting build for $buildType');
   final result = await inDir('dart-sdk/sdk', () async {
     logger.i("Building libdart");
     var script = './tools/build.py';
-    var args = ['--no-goma', '-m', 'release', 'libdart'];
+    var args = ['--no-goma', '-m', buildType, 'libdart'];
     var command = script;
     if (Platform.isWindows) {
       command = 'python';

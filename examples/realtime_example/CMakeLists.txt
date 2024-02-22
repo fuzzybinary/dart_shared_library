@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 set(CUTE_FRAMEWORK_STATIC ON)
+set(CF_FRAMEWORK_BUILD_TESTS OFF)
+# Samples Build on Windows Falied
+set(CF_FRAMEWORK_BUILD_SAMPLES OFF)
 
 include(FetchContent)
 FetchContent_Declare(

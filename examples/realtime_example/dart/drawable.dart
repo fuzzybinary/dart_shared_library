@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
-class CF_Color extends Struct {
+final class CF_Color extends Struct {
   @Float()
   external double r;
 
@@ -14,7 +14,7 @@ class CF_Color extends Struct {
   external double a;
 }
 
-class Drawable extends Struct {
+final class Drawable extends Struct {
   @Int32()
   external int x;
 

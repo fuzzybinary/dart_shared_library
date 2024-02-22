@@ -221,7 +221,7 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
     int exit_code = 0;
     dfe.CompileAndReadScript(script_uri, &application_kernel_buffer,
                              &application_kernel_buffer_size, error, &exit_code,
-                             resolved_packages_config, true);
+                             resolved_packages_config, true, false);
     if (application_kernel_buffer == nullptr) {
       std::cerr << "Error reading Dart script " << script_uri << ": " << *error
                 << std::endl;
