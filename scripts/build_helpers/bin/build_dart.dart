@@ -9,10 +9,14 @@ import 'package:path/path.dart' as path;
 void main(List<String> args) async {
   final parser = ArgParser();
   parser.addFlag('verbose', abbr: 'v', help: 'enable all debug');
-  parser.addOption('buildType',
-      abbr: 't',
-      help: 'build typ release or debug. all for both',
-      allowed: ['all', 'debug', 'release']);
+  parser.addMultiOption(
+    'target',
+    abbr: 't',
+    help: 'Target to build (release or debug)',
+    allowed: ['debug', 'release', 'all'],
+    defaultsTo: ['release'],
+  );
+  parser.addFlag('help', abbr: 'h');
 
   ArgResults? argResults;
   try {
@@ -21,6 +25,11 @@ void main(List<String> args) async {
     if (error is! FormatException) rethrow;
     print(parser.usage);
     exit(-1);
+  }
+
+  if (argResults['help'] == true) {
+    print(parser.usage);
+    return;
   }
 
   Level logLevel = Level.info;
@@ -32,9 +41,12 @@ void main(List<String> args) async {
     logLevel: logLevel,
   );
 
-  String buildType = argResults['buildType'] ?? "all";
+  var buildTargets = argResults['target'] as List<String>;
+  if (buildTargets.contains('all')) {
+    buildTargets = ['debug', 'release'];
+  }
 
-  BuildToolsLogger.shared.d('Build Typ $buildType');
+  BuildToolsLogger.shared.d('Build Targets $buildTargets');
 
   if (!checkRightDirectory()) {
     // Not run from root. Exit.
@@ -48,6 +60,10 @@ void main(List<String> args) async {
           'DEPOT_TOOLS_WIN_TOOOLCHAIN not set! Run ./setup_env.ps1 before running this script!');
       exit(-1);
     }
+    final gypMsysVersion = Platform.environment['GYP_MSVS_VERSION'];
+    final gypMsysOverridePath = Platform.environment['GYP_MSVS_OVERRIDE_PATH'];
+    BuildToolsLogger.shared.d('GYP_MSVS_VERSION $gypMsysVersion');
+    BuildToolsLogger.shared.d('GYP_MSVS_OVERRIDE_PATH $gypMsysOverridePath');
   }
 
   if (!await checkForDepotTools()) {
@@ -66,19 +82,8 @@ void main(List<String> args) async {
       exit(-1);
     }
 
-    if (buildType == "all") {
-      if (!await _buildDart('release')) {
-        exit(-1);
-      }
-      if (!await _buildDart('debug')) {
-        exit(-1);
-      }
-    } else if (buildType == "release") {
-      if (!await _buildDart('release')) {
-        exit(-1);
-      }
-    } else if (buildType == "debug") {
-      if (!await _buildDart('debug')) {
+    for (var target in buildTargets) {
+      if (!await _buildDart(target)) {
         exit(-1);
       }
     }
