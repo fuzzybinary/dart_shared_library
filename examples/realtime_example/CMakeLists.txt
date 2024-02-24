@@ -39,10 +39,4 @@ if (MSVC)
 	set_property(TARGET realtime_example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:realtime_example>)	
 endif()
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-    SET (project_BIN ${PROJECT_NAME})
-else()
-    SET (project_BIN ${PROJECT_NAME}.bin)
-endif()
-
 set(EXECUTABLE_OUTPUT_PATH "${EXECUTABLE_OUTPUT_PATH}/realtime_example")
