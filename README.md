@@ -5,7 +5,9 @@ This is an attempt / POC to build the Dart VM into a dynamic library, importable
 ## Eventual support
 
 The hope is that the the dynamic library will eventually support the following targets:
+
 * A "Fully Featured" .dll / .so that supports booting Dart in different configurations:
+
   * Boot (or not) the service and kernel isolates
   * Support Dart Source Compilation and / or Kernel Isolates
   * JIT from source or .dil
@@ -24,11 +26,13 @@ Github Actions currently builds a Windows x64 `.dll`, A Linux x64 `.so`, and a m
 ## Building
 
 ### Prerequisets
+
 You need:
+
 * git
 * Dart 3+
-* C++ build tools for your platform (Visual Studio, XCode, gcc, etc) 
-* For Windows 
+* C++ build tools for your platform (Visual Studio, XCode, gcc, etc)
+* For Windows
   * 2019 16.61 with 10.0.20348.0 SDK don't forget install Debugger Tools
   * 2022 17 with ? SDK don't forget install Debugger Tools
   * 2017 15 with ? SDK don't forget install Debugger Tools
@@ -43,9 +47,10 @@ Optionally, I recommend installing [`depot_tools`](https://www.chromium.org/deve
 > This will set up some environment variables that will be needed to build Dart properly.
 
 The first step is to build a statically linkable verison of Dart. This requires that we download Dart, patch some of the Dart build files, and then run the actual build. Thankfully there is a Dart script to do this.
-build_dart commandline 
- * -v -> Verbose Log
- * -t -> Build Type all, release, debug
+build_dart commandline
+
+* -v -> Verbose Log
+* -t -> Build Type all, release, debug
 
 ```bash
 cd ./scripts/build_helpers
@@ -55,11 +60,12 @@ dart ./scripts/build_helpers/bin/build_dart.dart
 ```
 
 This script does the following:
- * Pulls down `depot_tools` if needed.
- * Clones a fresh copy of the Dart sdk git repo using `fetch` if needed.
- * Uses `gsync` to syncs the repo the the version of dart specificed in `.dart_version`.
- * Applies `dart_sdk.patch` to the repo to create the statically linkable `libdart` library
- * Builds `libdart`
+
+* Pulls down `depot_tools` if needed.
+* Clones a fresh copy of the Dart sdk git repo using `fetch` if needed.
+* Uses `gsync` to syncs the repo the the version of dart specificed in `.dart_version`.
+* Applies `dart_sdk.patch` to the repo to create the statically linkable `libdart` library
+* Builds `libdart`
 
 ### CMake
 
