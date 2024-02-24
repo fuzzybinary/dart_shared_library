@@ -10,12 +10,9 @@ target_include_directories(simple_example PRIVATE
 )
 
 add_custom_command(TARGET simple_example POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example> $<TARGET_RUNTIME_DLLS:simple_example>
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example> ${PROJECT_SOURCE_DIR}/hello_world.dart
-  COMMAND_EXPAND_LISTS
-)
-
-add_dependencies(simple_example ALWAYS_DO_POST_BUILD)
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example> $<TARGET_RUNTIME_DLLS:simple_example>)
+add_custom_command(TARGET simple_example POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example> ${PROJECT_SOURCE_DIR}/hello_world.dart)
 
 target_link_libraries(simple_example PUBLIC dart_dll)
 

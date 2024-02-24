@@ -10,11 +10,11 @@ target_include_directories(simple_example_ffi PRIVATE
 )
 
 add_custom_command(TARGET simple_example_ffi POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example_ffi> $<TARGET_RUNTIME_DLLS:simple_example_ffi>
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example_ffi> ${PROJECT_SOURCE_DIR}/hello_world_ffi.dart
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/.dart_tool $<TARGET_FILE_DIR:simple_example_ffi>/.dart_tool
-  COMMAND_EXPAND_LISTS
-)
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example_ffi> $<TARGET_RUNTIME_DLLS:simple_example_ffi>)
+add_custom_command(TARGET simple_example_ffi POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:simple_example_ffi> ${PROJECT_SOURCE_DIR}/hello_world_ffi.dart)
+add_custom_command(TARGET simple_example_ffi POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/.dart_tool $<TARGET_FILE_DIR:simple_example_ffi>/.dart_tool)
 
 target_link_libraries(simple_example_ffi PUBLIC dart_dll)
 
