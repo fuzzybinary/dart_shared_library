@@ -3,3 +3,4 @@ dart-sdk/*
 build/*
 artifacts/*
 depot_tools/*
+out/*
