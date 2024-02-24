@@ -98,7 +98,11 @@ extern "C" {
 bool DartDll_Initialize(const DartDllConfig& config) {
   std::cout << "Initializig Dart ---- \n";
 
-  Dart_SetVMFlags(0, nullptr);
+  auto resultMessage = Dart_SetVMFlags(0, nullptr);
+  if(resultMessage != nullptr) {
+    std::cerr << "Dart initialization failed: " << resultMessage << std::endl;
+    return false;
+  }
 
   char* error = nullptr;
   if (!dart::embedder::InitOnce(&error)) {
@@ -132,7 +136,7 @@ bool DartDll_Initialize(const DartDllConfig& config) {
   std::cout << "Dart initialized, error was: "
             << (initError != nullptr ? initError : "null") << std::endl;
 
-  return true;
+  return initError != nullptr ? false : true;
 }
 
 Dart_Isolate DartDll_LoadScript(const char* script_uri,

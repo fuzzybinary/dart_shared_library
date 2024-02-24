@@ -3,7 +3,9 @@ import 'dart:ffi';
 import 'drawable.dart';
 
 class WorkFfiCalls {
-  final DynamicLibrary processLib = DynamicLibrary.process();
+  // On Linux this search fo Function in libdart_dll why ?
+  //final DynamicLibrary processLib = DynamicLibrary.process();
+  final DynamicLibrary processLib = DynamicLibrary.executable();
 
   late final createEntity = processLib
       .lookup<NativeFunction<Uint32 Function(Int32, Int32, Int32, Int32)>>(

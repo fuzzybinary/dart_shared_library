@@ -5,12 +5,36 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(gdb) RealTime Sample",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/x64/Debug/realtime_example/realtime_example",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/out/x64/Debug/realtime_example",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             
             "name": "(WIN)RealTime Sample",
             "type": "cppvsdbg",
             "request": "launch",
             //"preLaunchTask": "buildSimpelTest",
-            "program": "${workspaceFolder}/build/Debug/realtime_example.exe",
+            "program": "${workspaceFolder}/out/x64/Debug/realtime_example/realtime_example.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

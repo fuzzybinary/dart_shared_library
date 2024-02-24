@@ -18,6 +18,7 @@ FetchContent_MakeAvailable(cute)
 add_executable(realtime_example
 	main.cpp
 	drawable.cpp
+	exportfunc.cpp
 )
 
 target_include_directories(realtime_example PRIVATE
