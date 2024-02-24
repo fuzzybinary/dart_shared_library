@@ -6,6 +6,7 @@ using namespace Cute;
 #include <dart_tools_api.h>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 #include "drawable.h"
 
 static Dart_Isolate _dart_isolate = nullptr;
@@ -70,7 +71,10 @@ void dart_frame_maintanance() {
 
   while (_dart_pending_messages > 0) {
     
-    Dart_HandleMessage();
+    auto handle = Dart_HandleMessage();
+    if(Dart_IsError(handle)) {
+      std::cout << Dart_GetError(handle) << std::endl;
+    }
     _dart_pending_messages--;
   }
 
