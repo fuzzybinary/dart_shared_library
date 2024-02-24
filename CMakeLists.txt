@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project(DartSharedLibrary VERSION 0.1)
 
+option(BUILD_SMAPLES "Build the Sampels" ON)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(DART_DLL_DIR "${PROJECT_SOURCE_DIR}/src")
@@ -23,7 +25,9 @@ set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/out/${OUTPUT_PATH_EXT}/${CMAKE
 
 
 add_subdirectory(src)
-add_subdirectory(examples)
+if(BUILD_SMAPLES)
+    add_subdirectory(examples)
+endif(BUILD_SMAPLES)    
 
 MESSAGE(STATUS "Build to ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 MESSAGE(STATUS "Build to ${EXECUTABLE_OUTPUT_PATH}")
