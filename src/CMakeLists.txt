@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 
 project(dart_dll VERSION 0.1.2)
 
@@ -18,6 +18,8 @@ target_include_directories(dart_dll PRIVATE
 if(WIN32)
     set(LIB_PREFIX "lib")
 endif()
+
+cmake_path(ABSOLUTE_PATH DART_DIR NORMALIZE OUTPUT_VARIABLE DART_DIR)
 
 MESSAGE(STATUS "Dart SDK ${DART_DIR}")
 
