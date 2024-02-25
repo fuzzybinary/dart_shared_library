@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 
 project(dart_dll VERSION 0.1.2)
 
-set(DARTSDK_ROOTDIR "${PROJECT_SOURCE_DIR}/../dart-sdk" CACHE FILEPATH "Directory that dart-sdk is cloned too")
-set(DART_DIR "${DARTSDK_ROOTDIR}/sdk")
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS )
