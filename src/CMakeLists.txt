@@ -99,6 +99,3 @@ target_include_directories(dart_dll PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/dart_dll>  # <prefix>/include/mylib
 )
-
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/dart_dll.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES ${DART_DIR}/runtime/include/dart_api.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
