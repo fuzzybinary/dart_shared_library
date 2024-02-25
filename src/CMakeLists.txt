@@ -84,9 +84,13 @@ endif()
 
 if(LIB_DART_DEBUG) 
     target_link_libraries(dart_dll debug ${LIB_DART_DEBUG})
+else()
+    target_link_libraries(dart_dll debug ${LIB_DART_RELEASE})
 endif()
 
 target_link_libraries(dart_dll optimized ${LIB_DART_RELEASE})
+
+MESSAGE(STATUS "debug ${LIB_DART_DEBUG} optimized ${LIB_DART_RELEASE}")
 
 install(TARGETS dart_dll
         EXPORT dart_dllTargets
@@ -98,5 +102,5 @@ install(TARGETS dart_dll
 
 target_include_directories(dart_dll PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include/dart_dll>  # <prefix>/include/mylib
+  $<INSTALL_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  # <prefix>/include/mylib
 )
