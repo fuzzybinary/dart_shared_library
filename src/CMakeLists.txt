@@ -21,6 +21,10 @@ endif()
 
 MESSAGE(STATUS "Dart SDK ${DART_DIR}")
 
+if(NOT EXISTS "${DART_DIR}/runtime/include/dart_api.h")
+MESSAGE(FATAL_ERROR "Missing Dart SDK or not found")
+endif()
+
 find_library(LIB_DART_DEBUG
     NAMES "${LIB_PREFIX}dart"
     HINTS "${DART_DIR}/out/DebugX64/obj/runtime/bin" "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
