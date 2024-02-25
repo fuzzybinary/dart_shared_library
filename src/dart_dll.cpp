@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "dart_dll.h"
+#include "include/dart_dll.h"
 #include "isolate_setup.h"
 
 #include <include/dart_api.h>

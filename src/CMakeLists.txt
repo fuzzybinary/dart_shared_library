@@ -14,7 +14,7 @@ add_library(dart_dll SHARED
     isolate_setup.cpp
 )
 
-target_include_directories(dart_dll PUBLIC
+target_include_directories(dart_dll PRIVATE
     "${DART_DIR}/runtime"
 )
 
@@ -41,10 +41,6 @@ target_compile_definitions(dart_dll PRIVATE
 )
 
 if(WIN32)
-    set_property(TARGET dart_dll PROPERTY
-        MSVC_RUNTIME_LIBRARY "MultiThreaded"
-    )
-
     target_compile_definitions(dart_dll PRIVATE
         _HAS_EXCEPTIONS=0
         _SCL_SECURE=0
@@ -90,3 +86,19 @@ if(LIB_DART_DEBUG)
 endif()
 
 target_link_libraries(dart_dll optimized ${LIB_DART_RELEASE})
+
+install(TARGETS dart_dll
+        EXPORT dart_dllTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+target_include_directories(dart_dll PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/dart_dll>  # <prefix>/include/mylib
+)
+
+install(FILES dart_dll.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES dart_api.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

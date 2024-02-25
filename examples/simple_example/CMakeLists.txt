@@ -5,7 +5,6 @@ project(simple_example)
 add_executable(simple_example main.cpp)
 
 target_include_directories(simple_example PRIVATE
-    "${DART_DLL_DIR}"
     "${DART_DIR}/runtime/include"
 )
 
