@@ -27,7 +27,7 @@ jobs:
       - name:  Install
         run: |
               if [ "$RUNNER_OS" == "Linux" ]; then
-                apt install libegl1-mesa-dev
+                sudo apt-get install libegl1-mesa-dev
               fi
         shell: bash
       - run: dart pub get
