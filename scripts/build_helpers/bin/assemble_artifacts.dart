@@ -39,8 +39,10 @@ void _copyIncludeFiles(Directory dest) {
     file.copySync(destPath);
   }
 
-  final dartDllHeader = File('src/dart_dll.h');
-  dartDllHeader.copySync(path.join(dest.path, 'include', 'dart_dll.h'));
+  final dartDllHeader = File('src/include/dart_dll.h');
+  final destPath = path.join(path.join(dest.path, 'include', 'dart_dll.h'));
+  dartDllHeader.copySync(destPath);
+  logger.i('  ${dartDllHeader.path} => $destPath');
 }
 
 void _copyLibs(Directory dest) {
@@ -56,7 +58,7 @@ void _copyLibs(Directory dest) {
 
   var copyGlob = Glob('*.so');
   if (Platform.isWindows) {
-    copyGlob = Glob(r'Release/*.*', caseSensitive: false);
+    copyGlob = Glob('{Release/*.*,Debug/*.*}', caseSensitive: false);
   } else if (Platform.isMacOS) {
     copyGlob = Glob('*.dylib');
   }
