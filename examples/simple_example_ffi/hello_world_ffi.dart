@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
-@FfiNative<Void Function(Pointer<Utf8>)>("SimplePrint", isLeaf: true)
+@Native<Void Function(Pointer<Utf8>)>(symbol: "SimplePrint", isLeaf: true)
 external void simplePrint(Pointer<Utf8> string);
 
 void main() {

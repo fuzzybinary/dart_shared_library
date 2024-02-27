@@ -37,6 +37,7 @@ bool init_dart() {
   Dart_Handle result =
       Dart_Invoke(root_library, init_function_name, 0, nullptr);
   if (Dart_IsError(result)) {
+    std::cout << Dart_GetError(result);
     Dart_ExitScope();
     return false;
   }
@@ -99,15 +100,9 @@ void render_drawables() {
 // These need to be exposed as "C" functions and be exported
 //
 #if defined(_WIN32)
-#define WORM_EXPORT __declspec(dllexport)
-#elif defined(__GNUC__)
-#define WORM_EXPORT __attribute__((visibility("default")))
+#define WORM_EXPORT exten "C" __declspec(dllexport)
 #else
-#define WORM_EXPORT
-#endif
-
-#ifdef __cplusplus
-extern "C" {
+#define WORM_EXPORT extern "C" __attribute__((visibility("default"))) __attribute((used))
 #endif
 
 WORM_EXPORT unsigned int create_entity(int x, int y, int width, int height) {
@@ -139,10 +134,6 @@ WORM_EXPORT Drawable* get_drawable(unsigned int entity_id) {
 WORM_EXPORT bool get_key_just_pressed(int key_code) {
   return cf_key_just_pressed((CF_KeyButton)key_code);
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 int main(int argc, char* argv[]) {
   // Create a window with a resolution of 640 x 480.
