@@ -27,6 +27,12 @@ target_include_directories(realtime_example PRIVATE
     "${DART_DIR}/runtime/include"
 )
 
+if(LINUX)
+	# -export-dynamic is required on Linux if your symbols are in your executable,
+	# otherwise dlsym (and therefore Dart FFI) can't find them.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -export-dynamic")
+endif()
+
 add_custom_command(TARGET realtime_example POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:realtime_example> $<TARGET_RUNTIME_DLLS:realtime_example>)
 add_custom_command(TARGET realtime_example POST_BUILD
