@@ -16,4 +16,8 @@ add_custom_command(TARGET simple_example_ffi POST_BUILD
   COMMAND_EXPAND_LISTS
 )
 
+if (MSVC)
+	set_property(TARGET realtime_example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:simple_example_ffi>)	
+endif()
+
 target_link_libraries(simple_example_ffi PUBLIC dart_dll)
