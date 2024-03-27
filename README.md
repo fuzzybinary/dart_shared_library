@@ -69,3 +69,13 @@ Once Dart is built, you can use CMake to generate build files and / or build the
 cmake -B ./.build .
 cmake --build .\.build\ --config release
 ```
+
+### Troubleshooting
+
+#### Unresolved externals building Dart on Linux
+
+Two possible causes of this are having the snap package for Flutter installed, or having `depot_tools` not too far down your path. 
+
+First, uninstall the Flutter snap package and remove the dart-sdk build directory at `dart-sdk/sdk/out` and attempt to rebuild Dart.
+
+If that doesn't work, put `depot_tools` at the front of your path, instead of at the end. Clean the dart-sdk build directory, then attempt a rebuild.
