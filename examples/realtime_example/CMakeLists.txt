@@ -33,8 +33,14 @@ if(LINUX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -export-dynamic")
 endif()
 
+if (WIN32)
+	add_custom_command(TARGET realtime_example POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:realtime_example> $<TARGET_FILE_DIR:realtime_example>
+		COMMAND_EXPAND_LISTS
+	)
+endif()
+
 add_custom_command(TARGET realtime_example POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:realtime_example> $<TARGET_RUNTIME_DLLS:realtime_example>
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/dart/ $<TARGET_FILE_DIR:realtime_example>/dart
   COMMAND_EXPAND_LISTS
 )
@@ -44,5 +50,3 @@ target_link_libraries(realtime_example PUBLIC dart_dll cute)
 if (MSVC)
 	set_property(TARGET realtime_example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:realtime_example>)	
 endif()
-
-set(EXECUTABLE_OUTPUT_PATH "${EXECUTABLE_OUTPUT_PATH}/realtime_example")

@@ -32,12 +32,16 @@ endif()
 
 find_library(LIB_DART_DEBUG
     NAMES "${LIB_PREFIX}dart"
-    HINTS "${DART_DIR}/out/DebugX64/obj/runtime/bin" "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
+    HINTS "${DART_DIR}/out/DebugX64/obj/runtime/bin" 
+        "${DART_DIR}/xcodebuild/DebugX64/obj/runtime/bin"
+        "${DART_DIR}/xcodebuild/DebugARM64/obj/runtime/bin" 
 )
 
 find_library(LIB_DART_RELEASE
     NAMES "${LIB_PREFIX}dart"
-    HINTS "${DART_DIR}/out/ReleaseX64/obj/runtime/bin" "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
+    HINTS "${DART_DIR}/out/ReleaseX64/obj/runtime/bin" 
+        "${DART_DIR}/xcodebuild/ReleaseX64/obj/runtime/bin"
+        "${DART_DIR}/xcodebuild/ReleaseARM64/obj/runtime/bin"
 )
 
 target_compile_definitions(dart_dll PRIVATE
@@ -84,9 +88,15 @@ elseif(LINUX)
         ${CMAKE_DL_LIBS}
     )
 elseif(APPLE)
-    set(CMAKE_C_COMPILER "${DART_DIR}/buildtools/mac-x64/clang/bin/clang")
-    set(CMAKE_CXX_COMPILER "${DART_DIR}/buildtools/mac-x64/clang/bin/clang++")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -nostdlib++ ${DART_DIR}/buildtools/mac-x64/clang/lib/libc++.a -framework Cocoa -framework QuartzCore -framework Security")
+    if(CMAKE_APPLE_SILICON_PROCESSOR STREQUAL "arm64")
+        set(CMAKE_C_COMPILER "${DART_DIR}/buildtools/mac-arm64/clang/bin/clang")
+        set(CMAKE_CXX_COMPILER "${DART_DIR}/buildtools/mac-arm64/clang/bin/clang++")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -nostdlib++ ${DART_DIR}/buildtools/mac-arm64/clang/lib/libc++.a -framework Cocoa -framework QuartzCore -framework Security")
+    else()
+        set(CMAKE_C_COMPILER "${DART_DIR}/buildtools/mac-x64/clang/bin/clang")
+        set(CMAKE_CXX_COMPILER "${DART_DIR}/buildtools/mac-x64/clang/bin/clang++")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -nostdlib++ ${DART_DIR}/buildtools/mac-x64/clang/lib/libc++.a -framework Cocoa -framework QuartzCore -framework Security")
+    endif()
 endif()
 
 if(LIB_DART_DEBUG) 
