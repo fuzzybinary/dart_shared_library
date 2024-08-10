@@ -18,7 +18,7 @@ add_custom_command(TARGET simple_example POST_BUILD
 target_link_libraries(simple_example PUBLIC dart_dll)
 
 if (MSVC)
-	set_property(TARGET realtime_example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:simple_example>)	
+	set_property(TARGET simple_example PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:simple_example>)	
 endif()
 
 set(EXECUTABLE_OUTPUT_PATH "${EXECUTABLE_OUTPUT_PATH}/simple_example")

@@ -9,6 +9,8 @@
 #include <bin/dfe.h>
 #include <bin/isolate_data.h>
 #include <bin/loader.h>
+#include <bin/snapshot_utils.h>
+#include <platform/utils.h>
 
 using namespace dart::bin;
 
@@ -158,11 +160,42 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
                            void* callback_data,
                            char** error) {
   Dart_Handle result;
-
   uint8_t* kernel_buffer = nullptr;
   intptr_t kernel_buffer_size;
+  AppSnapshot* app_snapshot = nullptr;
+  std::shared_ptr<uint8_t> kernel_buffer_ptr;
 
-  dfe.ReadScript(script_uri, &kernel_buffer, &kernel_buffer_size);
+  bool isolate_run_app_snapshot = false;
+  const uint8_t* isolate_snapshot_data = kDartCoreIsolateSnapshotData;
+  const uint8_t* isolate_snapshot_instructions =
+      kDartCoreIsolateSnapshotInstructions;
+  
+  if (!is_main_isolate) {
+    app_snapshot = Snapshot::TryReadAppSnapshot(script_uri);
+    if (app_snapshot != nullptr && app_snapshot->IsJITorAOT()) {
+      if (app_snapshot->IsAOT()) {
+        *error = dart::Utils::SCreate(
+            "The uri(%s) provided to `Isolate.spawnUri()` is an "
+            "AOT snapshot and the JIT VM cannot spawn an isolate using it.",
+            script_uri);
+        delete app_snapshot;
+        return nullptr;
+      }
+      isolate_run_app_snapshot = true;
+      const uint8_t* ignore_vm_snapshot_data;
+      const uint8_t* ignore_vm_snapshot_instructions;
+      app_snapshot->SetBuffers(
+          &ignore_vm_snapshot_data, &ignore_vm_snapshot_instructions,
+          &isolate_snapshot_data, &isolate_snapshot_instructions);
+    }
+  }
+
+  if (kernel_buffer == nullptr && !isolate_run_app_snapshot) {
+    dfe.ReadScript(script_uri, app_snapshot, &kernel_buffer,
+                    &kernel_buffer_size, /*decode_uri=*/true,
+                    &kernel_buffer_ptr);
+  }
+
   flags->null_safety = true;
 
   DllIsolateGroupData* isolate_group_data = new DllIsolateGroupData(

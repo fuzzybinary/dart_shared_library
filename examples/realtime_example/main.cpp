@@ -1,6 +1,7 @@
 #include <cute.h>
 using namespace Cute;
 
+#include <iostream>
 #include <dart_dll.h>
 
 #include <dart_tools_api.h>
@@ -100,7 +101,7 @@ void render_drawables() {
 // These need to be exposed as "C" functions and be exported
 //
 #if defined(_WIN32)
-#define WORM_EXPORT exten "C" __declspec(dllexport)
+#define WORM_EXPORT extern "C" __declspec(dllexport)
 #else
 #define WORM_EXPORT extern "C" __attribute__((visibility("default"))) __attribute((used))
 #endif
@@ -137,10 +138,9 @@ WORM_EXPORT bool get_key_just_pressed(int key_code) {
 
 int main(int argc, char* argv[]) {
   // Create a window with a resolution of 640 x 480.
-  int options =
-      APP_OPTIONS_DEFAULT_GFX_CONTEXT | APP_OPTIONS_WINDOW_POS_CENTERED;
+  int options = APP_OPTIONS_WINDOW_POS_CENTERED;
   Result result =
-      make_app("Fancy Window Title", 0, 0, 640, 480, options, argv[0]);
+      make_app("Fancy Window Title", 0, 0, 0, 640, 480, options, argv[0]);
   if (is_error(result)) return -1;
 
   if (!init_dart()) return -1;

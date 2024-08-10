@@ -66,6 +66,8 @@ if(WIN32)
         Iphlpapi
         Psapi
         shlwapi
+        pathcch
+        ntdll
     )
     set_property(TARGET dart_dll PROPERTY
              MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

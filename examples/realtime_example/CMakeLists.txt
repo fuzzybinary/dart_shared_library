@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.21)
 project(realtime_example)
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
 set(CUTE_FRAMEWORK_STATIC ON)
 set(CF_FRAMEWORK_BUILD_TESTS OFF)
 # Samples Build on Windows Falied
@@ -14,6 +12,7 @@ include(FetchContent)
 FetchContent_Declare(
 	cute
 	GIT_REPOSITORY https://github.com/RandyGaul/cute_framework
+	GIT_TAG        a2341c72f02e019e157cfc3997cd81d98c825004
 )
 FetchContent_MakeAvailable(cute)
 
@@ -34,12 +33,11 @@ if(LINUX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -export-dynamic")
 endif()
 
-add_custom_target(ALWAYS_DO_POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:realtime_example> $<TARGET_RUNTIME_DLLS:simple_example_ffi>
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/dart $<TARGET_FILE_DIR:realtime_example>/dart
+add_custom_command(TARGET realtime_example POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:realtime_example> $<TARGET_RUNTIME_DLLS:realtime_example>
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/dart/ $<TARGET_FILE_DIR:realtime_example>/dart
   COMMAND_EXPAND_LISTS
 )
-add_dependencies(realtime_example ALWAYS_DO_POST_BUILD)
 
 target_link_libraries(realtime_example PUBLIC dart_dll cute)
 

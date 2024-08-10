@@ -178,7 +178,7 @@ Future<bool> _buildDart(String buildType) async {
   final result = await inDir('dart-sdk/sdk', () async {
     logger.i("Building libdart");
     var script = './tools/build.py';
-    var args = ['--no-goma', '-m', buildType, 'libdart'];
+    var args = ['-m', buildType, 'libdart'];
     var command = script;
     if (Platform.isWindows) {
       command = 'python';
