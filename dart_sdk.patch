@@ -1,8 +1,8 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 233a0900e55..5010af8fc55 100644
+index 3dd681d9d41..a8e43bc5953 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -99,6 +99,10 @@ group("create_sdk") {
+@@ -100,6 +100,10 @@ group("create_sdk") {
    public_deps = [ "sdk:create_sdk" ]
  }
  
@@ -14,10 +14,10 @@ index 233a0900e55..5010af8fc55 100644
    public_deps = [ "sdk:create_platform_sdk" ]
  }
 diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
-index fb45d1ec551..9ccb1a27f4a 100644
+index 29ada988abb..2e4cf4ea9c8 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -269,8 +269,9 @@ config("compiler") {
+@@ -260,8 +260,9 @@ config("compiler") {
        cflags += [ "-fPIC" ]
        ldflags += [ "-fPIC" ]
      } else {
@@ -30,10 +30,10 @@ index fb45d1ec551..9ccb1a27f4a 100644
    }
  
 diff --git a/runtime/bin/BUILD.gn b/runtime/bin/BUILD.gn
-index 91ebf8feb65..4ecf43807d4 100644
+index be0893506f2..7c5bb919ad4 100644
 --- a/runtime/bin/BUILD.gn
 +++ b/runtime/bin/BUILD.gn
-@@ -1143,3 +1143,47 @@ if (defined(is_linux) && is_linux && defined(is_asan) && is_asan &&
+@@ -1170,3 +1170,47 @@ if (defined(is_linux) && is_linux && defined(is_asan) && is_asan &&
      }
    }
  }

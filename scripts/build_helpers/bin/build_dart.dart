@@ -101,7 +101,7 @@ Future<bool> _fetchOrUpdateDartSdk() async {
   if (!Directory('dart-sdk').existsSync()) {
     logger.i('dart-sdk does not exist. Doing full fetch');
 
-    Directory('dart-sdk').create();
+    await Directory('dart-sdk').create();
 
     final fetchResult = await inDir('dart-sdk', () async {
       final fetchProcess =
@@ -162,6 +162,8 @@ Future<bool> _patchDartSdk() async {
     logger.i("Patching the Dart SDK to create libdart");
     var result = await Process.run('git', ['apply', '../../dart_sdk.patch'],
         runInShell: true);
+    logger.d("[patch-stdout] ${result.stdout}");
+    logger.d("[patch-stderr] ${result.stderr}");
     logger.d('Patch result is ${result.exitCode}');
     return result.exitCode;
   });
