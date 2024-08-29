@@ -8,14 +8,16 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-13, macos-latest]
         include:
           - os: windows-latest
             postfix: win
           - os: ubuntu-latest
             postfix: linux
-          - os: macos-latest
+          - os: macos-13
             postfix: macos-x64
+          - os: macos-latest
+            postfix: macos-arm64
     env:
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
     continue-on-error: true
