@@ -23,6 +23,8 @@ jobs:
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     steps:
+      - if: ${{ matrix.os == 'windows-latest' }}
+        run: git config --global core.autocrlf true
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
       - uses: ilammy/msvc-dev-cmd@v1

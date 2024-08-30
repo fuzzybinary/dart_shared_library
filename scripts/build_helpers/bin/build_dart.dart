@@ -160,8 +160,8 @@ Future<bool> _patchDartSdk() async {
   final logger = BuildToolsLogger.shared;
   final result = await inDir('dart-sdk/sdk', () async {
     logger.i("Patching the Dart SDK to create libdart");
-    var result = await Process.run('git',
-        ['apply', '--reject', '--whitespace=fix', '../../dart_sdk.patch'],
+    var result = await Process.run(
+        'git', ['apply', '--whitespace=fix', '../../dart_sdk.patch'],
         runInShell: true);
     logger.d("[patch-stdout] ${result.stdout}");
     logger.d("[patch-stderr] ${result.stderr}");
