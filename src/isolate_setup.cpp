@@ -5,11 +5,13 @@
 #include <include/dart_api.h>
 #include <include/dart_embedder_api.h>
 
+#include <bin/builtin.h>
 #include <bin/dartutils.h>
 #include <bin/dfe.h>
 #include <bin/isolate_data.h>
 #include <bin/loader.h>
 #include <bin/snapshot_utils.h>
+#include <bin/vmservice_impl.h>
 #include <platform/utils.h>
 
 using namespace dart::bin;
@@ -39,8 +41,11 @@ class DllIsolateGroupData : public IsolateGroupData {
 
 Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
                                IsolateData* isolate_data,
-                               bool is_isolate_group_start,
+                               bool is_isolate_group_start,                               
                                const char** resolved_packages_config) {
+  auto isolate_group_data = isolate_data->isolate_group_data();
+  const auto packages_file = isolate_data->packages_file();
+  const auto script_uri = isolate_group_data->script_url;
   Dart_Handle result;
 
   // Prepare builtin and other core libraries for use to resolve URIs.
@@ -49,8 +54,7 @@ Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
   result = DartUtils::PrepareForScriptLoading(false, true);
   if (Dart_IsError(result)) return result;
 
-  // Setup packages config if specified.
-  const char* packages_file = isolate_data->packages_file();
+  // Setup packages config if specified.  
   result = DartUtils::SetupPackageConfig(packages_file);
   if (Dart_IsError(result)) return result;
 
@@ -64,6 +68,15 @@ Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
           *resolved_packages_config);
     }
   }
+
+  // Setup the native resolver as the snapshot does not carry it.
+  Builtin::SetNativeResolver(Builtin::kBuiltinLibrary);
+  Builtin::SetNativeResolver(Builtin::kIOLibrary);
+  Builtin::SetNativeResolver(Builtin::kCLILibrary);
+  VmService::SetNativeResolver();
+
+  result = DartUtils::SetupIOLibrary(nullptr, script_uri, true);
+  if (Dart_IsError(result)) return result;
 
   return result;
 }
@@ -169,7 +182,7 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
   const uint8_t* isolate_snapshot_data = kDartCoreIsolateSnapshotData;
   const uint8_t* isolate_snapshot_instructions =
       kDartCoreIsolateSnapshotInstructions;
-  
+
   if (!is_main_isolate) {
     app_snapshot = Snapshot::TryReadAppSnapshot(script_uri);
     if (app_snapshot != nullptr && app_snapshot->IsJITorAOT()) {
@@ -192,8 +205,8 @@ Dart_Isolate CreateIsolate(bool is_main_isolate,
 
   if (kernel_buffer == nullptr && !isolate_run_app_snapshot) {
     dfe.ReadScript(script_uri, app_snapshot, &kernel_buffer,
-                    &kernel_buffer_size, /*decode_uri=*/true,
-                    &kernel_buffer_ptr);
+                   &kernel_buffer_size, /*decode_uri=*/true,
+                   &kernel_buffer_ptr);
   }
 
   flags->null_safety = true;

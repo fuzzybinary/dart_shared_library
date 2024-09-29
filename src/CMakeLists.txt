@@ -100,7 +100,7 @@ elseif(APPLE)
 endif()
 
 if(LIB_DART_DEBUG) 
-    target_link_libraries(dart_dll debug ${LIB_DART_DEBUG})
+   target_link_libraries(dart_dll debug ${LIB_DART_DEBUG})
 else()
     target_link_libraries(dart_dll debug ${LIB_DART_RELEASE})
 endif()

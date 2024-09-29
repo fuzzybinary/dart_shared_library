@@ -9,9 +9,12 @@
 #include <bin/dartutils.h>
 #include <bin/dfe.h>
 #include <bin/gzip.h>
+#include <bin/loader.h>
 #include <bin/isolate_data.h>
+#include <platform/utils.h>
 
 using namespace dart::bin;
+using namespace dart;
 
 static DartDllConfig _dart_dll_config;
 
@@ -74,13 +77,39 @@ bool OnIsolateInitialize(void** child_callback_data, char** error) {
   *child_callback_data = isolate_data;
 
   Dart_EnterScope();
+    
+  const auto script_uri = isolate_group_data->script_url;
+  // TODO
+  /*const bool isolate_run_app_snapshot =
+      isolate_group_data->RunFromAppSnapshot();*/
+  Dart_Handle result = SetupCoreLibraries(isolate, isolate_data,
+                                          /*group_start=*/false,
+                                          /*resolved_packages_config=*/nullptr);
+  if (Dart_IsError(result)) goto failed;
 
-  // Make the isolate runnable so that it is ready to handle messages.
+  result = DartUtils::ResolveScript(Dart_NewStringFromCString(script_uri));
+  if (Dart_IsError(result)) goto failed;
+
+  if (isolate_group_data->kernel_buffer() != nullptr) {
+    // Various core-library parts will send requests to the Loader to resolve
+    // relative URIs and perform other related tasks. We need Loader to be
+    // initialized for this to work because loading from Kernel binary
+    // bypasses normal source code loading paths that initialize it.
+    const char* resolved_script_uri = nullptr;
+    result = Dart_StringToCString(result, &resolved_script_uri);
+    if (Dart_IsError(result)) goto failed;
+    result = Loader::InitForSnapshot(resolved_script_uri, isolate_data);
+    if (Dart_IsError(result)) goto failed;
+  }
+
   Dart_ExitScope();
-  Dart_ExitIsolate();
-  *error = Dart_IsolateMakeRunnable(isolate);
-  Dart_EnterIsolate(isolate);
-  return *error == nullptr;
+
+  return true;
+
+failed:
+  *error = Utils::StrDup(Dart_GetError(result));
+  Dart_ExitScope();
+  return false;
 }
 
 static void OnIsolateShutdown(void*, void*) {
