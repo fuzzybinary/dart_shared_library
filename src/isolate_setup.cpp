@@ -69,6 +69,9 @@ Dart_Handle SetupCoreLibraries(Dart_Isolate isolate,
     }
   }
 
+  result = Dart_SetEnvironmentCallback(DartUtils::EnvironmentCallback);
+  if (Dart_IsError(result)) return result;
+
   // Setup the native resolver as the snapshot does not carry it.
   Builtin::SetNativeResolver(Builtin::kBuiltinLibrary);
   Builtin::SetNativeResolver(Builtin::kIOLibrary);
@@ -160,7 +163,11 @@ Dart_Isolate CreateVmServiceIsolate(const char* script_uri,
     return nullptr;
   }
 
-  // TODO -- Dart_SetEnvironmentCallback(DartUtils::EnvironmentCallback)
+  Dart_EnterIsolate(isolate);
+  Dart_EnterScope();
+  Dart_SetEnvironmentCallback(DartUtils::EnvironmentCallback);
+  Dart_ExitScope();
+  Dart_ExitIsolate();
 
   return isolate;
 }

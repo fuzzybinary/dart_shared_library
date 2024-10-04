@@ -8,6 +8,7 @@
 
 #include <bin/dartutils.h>
 #include <bin/dfe.h>
+#include <bin/file.h>
 #include <bin/gzip.h>
 #include <bin/loader.h>
 #include <bin/isolate_data.h>
@@ -29,6 +30,21 @@ extern unsigned int observatory_assets_archive_len;
 extern const uint8_t* observatory_assets_archive;
 }  // namespace bin
 }  // namespace dart
+
+static bool FileModifiedCallback(const char* url, int64_t since) {
+  auto path = File::UriToPath(url);
+  if (path == nullptr) {
+    // If it isn't a file on local disk, we don't know if it has been
+    // modified.
+    return true;
+  }
+  int64_t data[File::kStatSize];
+  File::Stat(nullptr, path.get(), data);
+  if (data[File::kType] == File::kDoesNotExist) {
+    return true;
+  }
+  return data[File::kModifiedTime] > since;
+}
 
 Dart_Handle GetVMServiceAssetsArchiveCallback() {
   uint8_t* decompressed = NULL;
@@ -160,6 +176,8 @@ bool DartDll_Initialize(const DartDllConfig& config) {
 
   std::cout << "Dart initialized, error was: "
             << (initError != nullptr ? initError : "null") << std::endl;
+
+  Dart_SetFileModifiedCallback(&FileModifiedCallback);
 
   return true;
 }
